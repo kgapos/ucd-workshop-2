@@ -1,0 +1,28 @@
+{
+  "name": "x402-workshop",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "wallet": "node scripts/wallet.js",
+    "balance": "node --env-file-if-exists=.env scripts/balance.js",
+    "register": "node --env-file-if-exists=.env scripts/register.js",
+    "server": "node --env-file-if-exists=.env --watch starter/server.js",
+    "client": "node --env-file-if-exists=.env starter/client.js",
+    "agent": "node --env-file-if-exists=.env starter/agent.js",
+    "fund": "node --env-file-if-exists=instructor/.env instructor/fund.js",
+    "board": "node --env-file-if-exists=instructor/.env instructor/board.js",
+    "loadtest": "node --env-file-if-exists=.env instructor/loadtest.js"
+  },
+  "dependencies": {
+    "@x402/core": "2.28.0",
+    "@x402/evm": "2.28.0",
+    "@x402/express": "2.28.0",
+    "@x402/fetch": "2.28.0",
+    "express": "5.3.0",
+    "viem": "2.57.4"
+  }
+}
