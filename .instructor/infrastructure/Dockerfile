@@ -5,6 +5,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 COPY config.js ./
 COPY .instructor/*.js .instructor/
+COPY .instructor/assets .instructor/assets
 ENV NODE_ENV=production
 RUN mkdir /data && chown node /data
 USER node

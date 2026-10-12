@@ -20,6 +20,7 @@ const wallets = {}; // address -> { address, usdc, eth, low }
 const app = express();
 app.set("trust proxy", true); // behind a reverse proxy, req.protocol comes from X-Forwarded-Proto
 app.use(express.json());
+app.use("/assets", express.static(new URL("assets", import.meta.url).pathname, { maxAge: "1d" }));
 
 app.post("/register", (req, res) => {
   const { name, address, url } = req.body || {};
@@ -69,17 +70,17 @@ app.get("/", (req, res) => {
     <div class="value">${w.usdc == null ? "…" : `${w.address === funder ? `<span class="amt">${TOKEN.USDC}${Number(w.usdc).toFixed(2)}</span>` : ""}<span class="amt">${TOKEN.ETH}${Number(w.eth).toFixed(4)}</span>`}</div>
     ${w.low ? `<div class="note">${esc(w.low)}</div>` : ""}</div>`;
   res.send(`<!doctype html><html lang="en"><meta charset="utf-8"><meta http-equiv="refresh" content="10">
-<meta name="viewport" content="width=device-width, initial-scale=1"><title>x402 Leaderboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>UCD Workshop - Leaderboard</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <script>try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
 <style>
   :root { --bg: #f6f7f9; --panel: #fff; --text: #111827; --muted: #6b7280; --border: #e5e7eb; --accent: #2563eb;
-    --up: #15803d; --up-bg: #dcfce7; --down: #b91c1c; --down-bg: #fee2e2; --warn: #b45309; --warn-bg: #fef3c7; color-scheme: light; }
+    --up: #15803d; --up-bg: #dcfce7; --down: #b91c1c; --down-bg: #fee2e2; --warn: #b45309; --warn-bg: #fef3c7; --logo: invert(1); color-scheme: light; }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0b0f17; --panel: #131a26; --text: #e5e7eb;
     --muted: #9ca3af; --border: #243044; --accent: #60a5fa; --up: #4ade80; --up-bg: #14532d55; --down: #f87171; --down-bg: #7f1d1d55;
-    --warn: #fbbf24; --warn-bg: #78350f55; color-scheme: dark; } }
+    --warn: #fbbf24; --warn-bg: #78350f55; --logo: none; color-scheme: dark; } }
   :root[data-theme="dark"] { --bg: #0b0f17; --panel: #131a26; --text: #e5e7eb; --muted: #9ca3af; --border: #243044; --accent: #60a5fa;
-    --up: #4ade80; --up-bg: #14532d55; --down: #f87171; --down-bg: #7f1d1d55; --warn: #fbbf24; --warn-bg: #78350f55; color-scheme: dark; }
+    --up: #4ade80; --up-bg: #14532d55; --down: #f87171; --down-bg: #7f1d1d55; --warn: #fbbf24; --warn-bg: #78350f55; --logo: none; color-scheme: dark; }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
   main { max-width: 72rem; margin: 0 auto; padding: 2rem 1rem 3rem; }
@@ -113,9 +114,11 @@ app.get("/", (req, res) => {
   .pill.warn { color: var(--warn); background: var(--warn-bg); margin: 0; }
   .empty { padding: 2rem; text-align: center; color: var(--muted); }
   footer { margin-top: 1rem; color: var(--muted); font-size: .8rem; }
+  .logos { display: flex; justify-content: center; align-items: center; gap: 2.5rem; margin-top: 3rem; }
+  .logos img { filter: var(--logo); opacity: .45; transition: opacity .2s; } .logos a:hover img { opacity: .9; }
 </style>
 <main>
-<header><img src="/favicon.svg" alt=""><h1>x402 Leaderboard</h1><button id="theme" type="button" aria-label="Toggle theme" title="Toggle theme"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button></header>
+<header><img src="/favicon.svg" alt=""><h1>UCD Workshop - Leaderboard</h1><button id="theme" type="button" aria-label="Toggle theme" title="Toggle theme"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button></header>
 <div class="register">Register with <code>npm run register -- ${esc(boardUrl)}</code></div>
 <div class="grid">${stat("Registered", rows.length)}${stat("APIs up", up)}${stat("Paid requests", paid)}${stat("USDC moved", `<span class="amt">${TOKEN.USDC}${usdc(earned)}</span>`)}${wallet("Funder", wallets[funder]) || ""}${wallet("Facilitator gas", wallets[facilitator]) || ""}</div>
 <div class="table">${rows.length ? `<table><thead><tr><th>#</th><th>Name</th><th>API</th><th class="num">Paid requests</th><th class="num">USDC earned</th><th class="num">Payments made</th><th class="num">Balance</th><th>Wallet</th></tr></thead><tbody>
@@ -125,6 +128,8 @@ ${rows.map((r, i) => `<tr><td>${i < 3 && r.count ? ["🥇", "🥈", "🥉"][i] :
 <td class="num">${r.balance == null ? "…" : BigInt(r.balance) === 0n ? `<span class="pill warn">not funded</span>` : `<span class="amt">${TOKEN.USDC}${Number(usdc(r.balance)).toFixed(3)}</span>`}</td>
 <td>${addr(r.address)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">Nobody has registered yet.</div>`}</div>
 <footer>Base Sepolia · refreshes every 10 seconds · <a href="/apis.json">apis.json</a></footer>
+<div class="logos"><a href="https://www.ucd.ie" title="University College Dublin"><img src="/assets/ucd.png" alt="UCD" height="44"></a>
+<a href="https://www.plasma.org" title="Plasma"><img src="/assets/plasma.svg" alt="Plasma" height="22"></a></div>
 </main>
 <script>document.getElementById("theme").onclick = () => {
   const root = document.documentElement, dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
