@@ -22,7 +22,7 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 - [x] `cd .instructor/infrastructure && docker compose up -d --build`, then check that both services are healthy.
 - [x] Expose both services over HTTPS: `https://facilitator.kgapos.com` -> port 4022 and
       `https://ucd.kgapos.com` -> port 8081.
-- [ ] Set `CLASS_FACILITATOR_URL=https://facilitator.kgapos.com` in `.instructor/.env` and run `docker compose up -d`.
+- [x] Set `CLASS_FACILITATOR_URL=https://facilitator.kgapos.com` in `.instructor/.env` and run `docker compose up -d`.
 - [x] Verify from outside: `curl https://facilitator.kgapos.com/supported` and open `https://ucd.kgapos.com`.
       Checked on 2026-10-12: a payment settled through the facilitator, and a load test passed 40/40 at concurrency 20.
 - [ ] Decide on `RPC_URL`: keep the public endpoints, or add an RPC provider key or your own node first in the list.
