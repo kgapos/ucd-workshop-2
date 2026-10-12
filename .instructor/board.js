@@ -73,7 +73,8 @@ app.get("/", (req, res) => {
   h1 { font-size: 1.6rem; margin: 0; letter-spacing: -.01em; flex: 1; }
   a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
   code { font: .85em ui-monospace, SFMono-Regular, Menlo, monospace; }
-  button { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--border); border-radius: .5rem; padding: .3rem .7rem; cursor: pointer; }
+  button { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--border); border-radius: 999px; width: 2.25rem; height: 2.25rem; display: grid; place-items: center; cursor: pointer; }
+  button:hover { border-color: var(--accent); color: var(--accent); }
   .register { margin: 1rem 0 1.5rem; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; color: var(--muted); }
   .register code { background: var(--panel); border: 1px solid var(--border); border-radius: .5rem; padding: .35rem .6rem; color: var(--text); overflow-wrap: anywhere; }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .75rem; margin-bottom: .75rem; }
@@ -96,7 +97,7 @@ app.get("/", (req, res) => {
   footer { margin-top: 1rem; color: var(--muted); font-size: .8rem; }
 </style>
 <main>
-<header><img src="/favicon.svg" alt=""><h1>x402 class board</h1><button id="theme" type="button">Toggle theme</button></header>
+<header><img src="/favicon.svg" alt=""><h1>x402 class board</h1><button id="theme" type="button" aria-label="Toggle theme" title="Toggle theme"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button></header>
 <div class="register">Register with <code>npm run register -- ${esc(boardUrl)}</code></div>
 <div class="grid">${stat("Registered", rows.length)}${stat("APIs up", up)}${stat("Paid requests", paid)}${stat("USDC moved", usdc(earned))}</div>
 ${funder || facilitator ? `<div class="grid wallets">${wallet("Funder", wallets[funder]) || ""}${wallet("Facilitator gas", wallets[facilitator]) || ""}</div>` : ""}
