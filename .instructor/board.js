@@ -121,7 +121,7 @@ app.get("/", (req, res) => {
 <div class="table">${rows.length ? `<table><thead><tr><th>#</th><th>Name</th><th>API</th><th class="num">Paid requests</th><th class="num">USDC earned</th><th class="num">Payments made</th><th class="num">Balance</th><th>Wallet</th></tr></thead><tbody>
 ${rows.map((r, i) => `<tr><td>${i < 3 && r.count ? ["🥇", "🥈", "🥉"][i] : i + 1}</td><td>${esc(r.name)}</td>
 <td><span class="pill ${r.up ? "up" : "down"}">${r.up ? "up" : esc(r.note || "down")}</span><a href="${esc(r.url)}">${esc(r.url.replace(/^https?:\/\//, "").slice(0, 32))}</a></td>
-<td class="num">${r.count || 0}</td><td class="num">${usdc(r.received)}</td><td class="num">${r.paidOut || 0}</td>
+<td class="num">${r.count || 0}</td><td class="num"><span class="amt">${TOKEN.USDC}${usdc(r.received)}</span></td><td class="num">${r.paidOut || 0}</td>
 <td class="num">${r.balance == null ? "…" : BigInt(r.balance) === 0n ? `<span class="pill warn">not funded</span>` : `<span class="amt">${TOKEN.USDC}${Number(usdc(r.balance)).toFixed(3)}</span>`}</td>
 <td>${addr(r.address)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">Nobody has registered yet.</div>`}</div>
 <footer>Base Sepolia · refreshes every 10 seconds · <a href="/apis.json">apis.json</a></footer>
