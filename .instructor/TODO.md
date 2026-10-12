@@ -16,21 +16,22 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 
 ### Homelab infrastructure
 
-- [ ] Clone the repository on the Docker host.
-- [ ] Copy `.instructor/.env` to the host (`FUNDER_PRIVATE_KEY`, `FACILITATOR_PRIVATE_KEY`, `RPC_URL`).
+- [x] Clone the repository on the Docker host.
+- [x] Copy `.instructor/.env` to the host (`FUNDER_PRIVATE_KEY`, `FACILITATOR_PRIVATE_KEY`, `RPC_URL`).
       Use a secure channel, and never commit it.
-- [ ] `cd .instructor/infrastructure && docker compose up -d --build`, then check that both services are healthy.
-- [ ] Expose both services over HTTPS through the reverse proxy or tunnel, for example
-      `facilitator.<domain>` -> port 4022 and `board.<domain>` -> port 8081.
-- [ ] Set `CLASS_FACILITATOR_URL=https://facilitator.<domain>` in `.instructor/.env` and run `docker compose up -d`.
-- [ ] Verify from outside: `curl https://facilitator.<domain>/supported` and open `https://board.<domain>`.
+- [x] `cd .instructor/infrastructure && docker compose up -d --build`, then check that both services are healthy.
+- [x] Expose both services over HTTPS: `https://facilitator.kgapos.com` -> port 4022 and
+      `https://ucd.kgapos.com` -> port 8081.
+- [ ] Set `CLASS_FACILITATOR_URL=https://facilitator.kgapos.com` in `.instructor/.env` and run `docker compose up -d`.
+- [x] Verify from outside: `curl https://facilitator.kgapos.com/supported` and open `https://ucd.kgapos.com`.
+      Checked on 2026-10-12: a payment settled through the facilitator, and a load test passed 40/40 at concurrency 20.
 - [ ] Decide on `RPC_URL`: keep the public endpoints, or add an RPC provider key or your own node first in the list.
 
 ### Rehearsal (the day before)
 
-- [ ] Open a fresh Codespace as a student: `npm run wallet`, `npm run register -- https://board.<domain>`,
+- [ ] Open a fresh Codespace as a student: `npm run wallet`, `npm run register -- https://ucd.kgapos.com`,
       then confirm `FACILITATOR_URL` was saved to `.env`.
-- [ ] Fund it with `npm run fund -- https://board.<domain>/apis.json`, then complete Parts 1 and 2 using the TODO hints.
+- [ ] Fund it with `npm run fund -- https://ucd.kgapos.com/apis.json`, then complete Parts 1 and 2 using the TODO hints.
 - [ ] Load test at class size against an API that uses the homelab facilitator:
       `npm run loadtest -- <api-url>/fortune --requests 100 --concurrency 40`.
 - [ ] Clear test registrations: stop the board, delete `students.json` from the `board-data` volume, then start it again.
@@ -58,7 +59,7 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 - [ ] Before students arrive: check that `docker compose ps` is healthy, open the board on the projector,
       and confirm the funder balances.
 - [ ] Part 0: share the board URL. Once most students have registered, run
-      `npm run fund -- https://board.<domain>/apis.json --dry-run`, then run it for real.
+      `npm run fund -- https://ucd.kgapos.com/apis.json --dry-run`, then run it for real.
       Re-run it for late arrivals.
 - [ ] About an hour in: release the reference solution (`git merge solution && git push origin main`) and
       tell students to `git pull`.

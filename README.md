@@ -149,7 +149,7 @@ npm run wallet
 Register with the class board, using the board URL from the slides:
 
 ```bash
-npm run register -- https://<board-url>
+npm run register -- https://ucd.kgapos.com
 ```
 
 This sends your name, address and API URL to the board, and saves the class settings to your `.env`.
