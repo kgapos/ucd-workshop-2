@@ -34,7 +34,9 @@ async function worker() {
     let outcome;
     try {
       const res = await fetchWithPayment(url);
-      const err = res.headers.get("PAYMENT-REQUIRED") && JSON.parse(atob(res.headers.get("PAYMENT-REQUIRED"))).error;
+      const header = (name) => res.headers.get(name) && JSON.parse(atob(res.headers.get(name)));
+      const settled = header("PAYMENT-RESPONSE");
+      const err = settled?.success === false ? `settle: ${settled.errorReason} ${settled.errorMessage?.match(/Details: .*/)?.[0] || ""}` : header("PAYMENT-REQUIRED")?.error;
       outcome = res.ok ? `${res.status}` : `${res.status} ${err || (await res.text()).slice(0, 80)}`;
     } catch (e) {
       outcome = `error ${e.message.slice(0, 80)}`;
