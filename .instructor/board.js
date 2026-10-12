@@ -110,6 +110,7 @@ app.get("/", (req, res) => {
   .num { text-align: right; font-variant-numeric: tabular-nums; }
   .pill { display: inline-block; border-radius: 999px; padding: .1rem .55rem; font-size: .8rem; font-weight: 600; margin-right: .4rem; }
   .pill.up { color: var(--up); background: var(--up-bg); } .pill.down { color: var(--down); background: var(--down-bg); }
+  .pill.warn { color: var(--warn); background: var(--warn-bg); margin: 0; }
   .empty { padding: 2rem; text-align: center; color: var(--muted); }
   footer { margin-top: 1rem; color: var(--muted); font-size: .8rem; }
 </style>
@@ -117,10 +118,11 @@ app.get("/", (req, res) => {
 <header><img src="/favicon.svg" alt=""><h1>x402 Leaderboard</h1><button id="theme" type="button" aria-label="Toggle theme" title="Toggle theme"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button></header>
 <div class="register">Register with <code>npm run register -- ${esc(boardUrl)}</code></div>
 <div class="grid">${stat("Registered", rows.length)}${stat("APIs up", up)}${stat("Paid requests", paid)}${stat("USDC moved", `<span class="amt">${TOKEN.USDC}${usdc(earned)}</span>`)}${wallet("Funder", wallets[funder]) || ""}${wallet("Facilitator gas", wallets[facilitator]) || ""}</div>
-<div class="table">${rows.length ? `<table><thead><tr><th>#</th><th>Name</th><th>API</th><th class="num">Paid requests</th><th class="num">USDC earned</th><th class="num">Payments made</th><th>Wallet</th></tr></thead><tbody>
+<div class="table">${rows.length ? `<table><thead><tr><th>#</th><th>Name</th><th>API</th><th class="num">Paid requests</th><th class="num">USDC earned</th><th class="num">Payments made</th><th class="num">Balance</th><th>Wallet</th></tr></thead><tbody>
 ${rows.map((r, i) => `<tr><td>${i < 3 && r.count ? ["🥇", "🥈", "🥉"][i] : i + 1}</td><td>${esc(r.name)}</td>
 <td><span class="pill ${r.up ? "up" : "down"}">${r.up ? "up" : esc(r.note || "down")}</span><a href="${esc(r.url)}">${esc(r.url.replace(/^https?:\/\//, "").slice(0, 32))}</a></td>
 <td class="num">${r.count || 0}</td><td class="num">${usdc(r.received)}</td><td class="num">${r.paidOut || 0}</td>
+<td class="num">${r.balance == null ? "…" : BigInt(r.balance) === 0n ? `<span class="pill warn">not funded</span>` : `<span class="amt">${TOKEN.USDC}${Number(usdc(r.balance)).toFixed(3)}</span>`}</td>
 <td>${addr(r.address)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">Nobody has registered yet.</div>`}</div>
 <footer>Base Sepolia · refreshes every 10 seconds · <a href="/apis.json">apis.json</a></footer>
 </main>
@@ -181,6 +183,12 @@ async function checkWallets() {
     w.low = low(Number(w.usdc), Number(w.eth)) ? "Running low, top it up" : "";
     wallets[address] = w;
   }
+  // Every student's USDC balance in one multicall, so a missed funding transfer stands out.
+  const addresses = Object.keys(students);
+  const results = await publicClient.multicall({
+    contracts: addresses.map((a) => ({ address: USDC, abi: [balanceOf], functionName: "balanceOf", args: [a] })),
+  });
+  results.forEach((r, i) => { if (r.status === "success") (status[addresses[i]] ||= {}).balance = r.result.toString(); });
 }
 
 const every = (ms, fn) => { const run = () => fn().catch((e) => console.error(fn.name, e.shortMessage || e.message)); run(); setInterval(run, ms); };
