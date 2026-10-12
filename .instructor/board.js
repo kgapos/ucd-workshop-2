@@ -52,6 +52,13 @@ const TOKEN = {
   USDC: `<svg class="token" viewBox="0 0 32 32" role="img" aria-label="USDC"><title>USDC</title><circle cx="16" cy="16" r="16" fill="#2775ca"/><text x="16" y="22.5" font-family="system-ui,sans-serif" font-size="19" font-weight="700" fill="#fff" text-anchor="middle">$</text></svg>`,
   ETH: `<svg class="token" viewBox="0 0 32 32" role="img" aria-label="ETH"><title>ETH</title><circle cx="16" cy="16" r="16" fill="#627eea"/><path fill="#fff" fill-opacity=".6" d="M16 4v8.9l7.5 3.3z"/><path fill="#fff" d="M16 4 8.5 16.2l7.5-3.3z"/><path fill="#fff" fill-opacity=".6" d="M16 22v6l7.5-10.4z"/><path fill="#fff" d="M16 28v-6l-7.5-4.4z"/><path fill="#fff" fill-opacity=".2" d="m16 20.6 7.5-4.4-7.5-3.3z"/><path fill="#fff" fill-opacity=".6" d="m8.5 16.2 7.5 4.4v-7.7z"/></svg>`,
 };
+const glyph = (color, label, body) =>
+  `<svg class="token" viewBox="0 0 32 32" aria-hidden="true"><title>${label}</title><circle cx="16" cy="16" r="16" fill="${color}"/>${body}</svg>`;
+const STAT = {
+  registered: glyph("#0ea5e9", "Registered", `<circle cx="16" cy="12" r="4.5" fill="#fff"/><path d="M8.5 24c0-4.1 3.4-7 7.5-7s7.5 2.9 7.5 7z" fill="#fff"/>`),
+  up: glyph("#16a34a", "APIs up", `<path d="M6.5 17h4.5l2.5-6 4 11 2.5-5h5.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`),
+  paid: glyph("#f59e0b", "Paid requests", `<path d="M17.5 6 9.5 18h6l-1 8 8-12h-6z" fill="#fff"/>`),
+};
 app.get("/favicon.svg", (req, res) => res.type("image/svg+xml").send(ICON));
 
 app.get("/", (req, res) => {
@@ -113,23 +120,26 @@ app.get("/", (req, res) => {
   .pill.up { color: var(--up); background: var(--up-bg); } .pill.down { color: var(--down); background: var(--down-bg); }
   .pill.warn { color: var(--warn); background: var(--warn-bg); margin: 0; }
   .empty { padding: 2rem; text-align: center; color: var(--muted); }
-  footer { margin-top: 1rem; color: var(--muted); font-size: .8rem; }
-  .logos { display: flex; justify-content: center; align-items: center; gap: 2.5rem; margin-top: 3rem; }
+  footer { margin-top: 1.25rem; color: var(--muted); font-size: .8rem; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem; }
+  footer .right { text-align: right; }
+  @media (max-width: 40rem) { footer { grid-template-columns: 1fr; text-align: center; } footer .right { text-align: center; } }
+  .logos { display: flex; justify-content: center; align-items: center; gap: 2rem; }
   .logos img { filter: var(--logo); opacity: .45; transition: opacity .2s; } .logos a:hover img { opacity: .9; }
 </style>
 <main>
 <header><img src="/favicon.svg" alt=""><h1>UCD Workshop - Leaderboard</h1><button id="theme" type="button" aria-label="Toggle theme" title="Toggle theme"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button></header>
 <div class="register">Register with <code>npm run register -- ${esc(boardUrl)}</code></div>
-<div class="grid">${stat("Registered", rows.length)}${stat("APIs up", up)}${stat("Paid requests", paid)}${stat("USDC moved", `<span class="amt">${TOKEN.USDC}${usdc(earned)}</span>`)}${wallet("Funder", wallets[funder]) || ""}${wallet("Facilitator gas", wallets[facilitator]) || ""}</div>
+<div class="grid">${stat("Registered", `<span class="amt">${STAT.registered}${rows.length}</span>`)}${stat("APIs up", `<span class="amt">${STAT.up}${up}</span>`)}${stat("Paid requests", `<span class="amt">${STAT.paid}${paid}</span>`)}${stat("USDC moved", `<span class="amt">${TOKEN.USDC}${usdc(earned)}</span>`)}${wallet("Funder", wallets[funder]) || ""}${wallet("Facilitator gas", wallets[facilitator]) || ""}</div>
 <div class="table">${rows.length ? `<table><thead><tr><th>#</th><th>Name</th><th>API</th><th class="num">Paid requests</th><th class="num">USDC earned</th><th class="num">Payments made</th><th class="num">Balance</th><th>Wallet</th></tr></thead><tbody>
 ${rows.map((r, i) => `<tr><td>${i < 3 && r.count ? ["🥇", "🥈", "🥉"][i] : i + 1}</td><td>${esc(r.name)}</td>
 <td><span class="pill ${r.up ? "up" : "down"}">${r.up ? "up" : esc(r.note || "down")}</span><a href="${esc(r.url)}">${esc(r.url.replace(/^https?:\/\//, "").slice(0, 32))}</a></td>
 <td class="num">${r.count || 0}</td><td class="num"><span class="amt">${TOKEN.USDC}${usdc(r.received)}</span></td><td class="num">${r.paidOut || 0}</td>
 <td class="num">${r.balance == null ? "…" : BigInt(r.balance) === 0n ? `<span class="pill warn">not funded</span>` : `<span class="amt">${TOKEN.USDC}${Number(usdc(r.balance)).toFixed(3)}</span>`}</td>
 <td>${addr(r.address)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">Nobody has registered yet.</div>`}</div>
-<footer>Base Sepolia · refreshes every 10 seconds · <a href="/apis.json">apis.json</a></footer>
-<div class="logos"><a href="https://www.ucd.ie" title="University College Dublin"><img src="/assets/ucd.png" alt="UCD" height="44"></a>
-<a href="https://www.plasma.org" title="Plasma"><img src="/assets/plasma.svg" alt="Plasma" height="22"></a></div>
+<footer><div>Base Sepolia · refreshes every 10 seconds · <a href="/apis.json">apis.json</a></div>
+<div class="logos"><a href="https://www.ucd.ie" title="University College Dublin"><img src="/assets/ucd.png" alt="UCD" height="34"></a>
+<a href="https://www.plasma.org" title="Plasma"><img src="/assets/plasma.svg" alt="Plasma" height="18"></a></div>
+<div class="right">Testnet only · no real funds · for teaching purposes</div></footer>
 </main>
 <script>document.getElementById("theme").onclick = () => {
   const root = document.documentElement, dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
