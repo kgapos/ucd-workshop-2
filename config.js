@@ -9,8 +9,10 @@ export const EXPLORER = "https://sepolia.basescan.org";
 export const FACILITATOR_URL = process.env.FACILITATOR_URL || "https://x402.org/facilitator";
 export const PORT = Number(process.env.PORT || 4021);
 
-// RPC_URL may list several endpoints, comma-separated: requests fail over from one to the next.
-const rpcUrls = (process.env.RPC_URL || "").split(",").map((u) => u.trim()).filter(Boolean);
+// Public Base Sepolia RPCs, tried in order: requests fail over from one to the next.
+// RPC_URL overrides them with your own comma-separated list.
+const DEFAULT_RPCS = "https://base-sepolia-rpc.publicnode.com,https://sepolia.base.org,https://base-sepolia.gateway.tenderly.co,https://base-sepolia.api.onfinality.io/public";
+const rpcUrls = (process.env.RPC_URL || DEFAULT_RPCS).split(",").map((u) => u.trim()).filter(Boolean);
 export const transport = rpcUrls.length > 1 ? fallback(rpcUrls.map((u) => http(u))) : http(rpcUrls[0]);
 export const publicClient = createPublicClient({ chain: baseSepolia, transport });
 

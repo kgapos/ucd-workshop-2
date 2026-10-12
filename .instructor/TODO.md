@@ -17,7 +17,7 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 ### Homelab infrastructure
 
 - [x] Clone the repository on the Docker host.
-- [x] Copy `.instructor/.env` to the host (`FUNDER_PRIVATE_KEY`, `FACILITATOR_PRIVATE_KEY`, `RPC_URL`).
+- [x] Copy `.instructor/.env` to the host (`FUNDER_PRIVATE_KEY`, `FACILITATOR_PRIVATE_KEY`).
       Use a secure channel, and never commit it.
 - [x] `cd .instructor/infrastructure && docker compose up -d --build`, then check that both services are healthy.
 - [x] Expose both services over HTTPS: `https://facilitator.kgapos.com` -> port 4022 and
@@ -25,8 +25,8 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 - [x] Set `CLASS_FACILITATOR_URL=https://facilitator.kgapos.com` in `.instructor/.env` and run `docker compose up -d`.
 - [x] Verify from outside: `curl https://facilitator.kgapos.com/supported` and open `https://ucd.kgapos.com`.
       Checked on 2026-10-12: a payment settled through the facilitator, and a load test passed 40/40 at concurrency 20.
-- [ ] Add the two extra public RPCs (Tenderly, OnFinality) to `RPC_URL` in the homelab `.instructor/.env`, as in the
-      instructor README, then run `docker compose up -d`.
+- [ ] Remove the `RPC_URL` line from the homelab `.instructor/.env`, so that the four public RPCs in `config.js`
+      apply, then `git pull` and `docker compose up -d --build`.
 
 ### Rehearsal (the day before)
 

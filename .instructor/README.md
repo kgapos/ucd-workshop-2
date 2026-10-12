@@ -38,10 +38,9 @@ A few days ahead, because faucets limit how often you can claim.
 
    Check them with `npm run balance -- <address>`.
 
-4. Set `RPC_URL` in `.instructor/.env`. It takes one or more comma-separated Base Sepolia endpoints,
-   and requests fail over from one to the next. The default public RPC (`sepolia.base.org`)
-   rate-limits under load, so put a better endpoint first, for example
-   `RPC_URL=https://base-sepolia-rpc.publicnode.com,https://sepolia.base.org,https://base-sepolia.gateway.tenderly.co,https://base-sepolia.api.onfinality.io/public`.
+4. Optionally, set `RPC_URL` in `.instructor/.env`. By default, every script uses four public Base Sepolia
+   RPCs (listed in `config.js`) and fails over from one to the next. To use your own provider or node,
+   set `RPC_URL` to one or more comma-separated endpoints, which replace the defaults.
 
 5. Do a rehearsal (see [On the day](#on-the-day)), then run the load test at class size:
 
@@ -57,7 +56,7 @@ A few days ahead, because faucets limit how often you can claim.
 ```bash
 FUNDER_PRIVATE_KEY=0x...
 FACILITATOR_PRIVATE_KEY=0x...
-RPC_URL=https://...,https://...           # one or more Base Sepolia RPCs, comma-separated
+# RPC_URL=https://...,https://...         # optional, replaces the public RPCs in config.js
 CLASS_FACILITATOR_URL=https://...-4022.app.github.dev   # public URL of your facilitator, handed to students
 # USDC_AMOUNT=1      ETH_AMOUNT=0.0005    BATCH=10
 ```
@@ -85,8 +84,8 @@ volume and survive restarts.
 > costs its wallet testnet gas. Keep only a little ETH in it, and share the URL only with the class.
 
 We do not run our own Base Sepolia node. The official node needs 32 GB+ RAM, a large NVMe disk, its
-own L1 Sepolia RPC and beacon endpoints, and hours to days to sync. A couple of public endpoints in
-`RPC_URL` handled 40 concurrent payments without errors in testing.
+own L1 Sepolia RPC and beacon endpoints, and hours to days to sync. The public endpoints in
+`config.js` handled 40 concurrent payments without errors in testing.
 
 ## On the day
 
