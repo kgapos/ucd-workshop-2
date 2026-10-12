@@ -123,7 +123,7 @@ app.get("/", (req, res) => {
   footer { margin-top: 1.25rem; color: var(--muted); font-size: .8rem; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem; }
   footer .right { text-align: right; }
   @media (max-width: 40rem) { footer { grid-template-columns: 1fr; text-align: center; } footer .right { text-align: center; } }
-  .logos { display: flex; justify-content: center; align-items: center; gap: 1.5rem; }
+  .logos { display: flex; justify-content: center; align-items: center; gap: 2rem; }
   .logos img { filter: var(--logo); opacity: .45; transition: opacity .2s; } .logos a:hover img { opacity: .9; }
 </style>
 <main>
@@ -137,7 +137,7 @@ ${rows.map((r, i) => `<tr><td>${i < 3 && r.count ? ["🥇", "🥈", "🥉"][i] :
 <td class="num">${r.balance == null ? "…" : BigInt(r.balance) === 0n ? `<span class="pill warn">not funded</span>` : `<span class="amt">${TOKEN.USDC}${Number(usdc(r.balance)).toFixed(3)}</span>`}</td>
 <td>${addr(r.address)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">Nobody has registered yet.</div>`}</div>
 <footer><div>Base Sepolia · refreshes every 10 seconds · <a href="/apis.json">apis.json</a></div>
-<div class="logos"><span>Special thanks to</span><a href="https://www.ucd.ie" title="University College Dublin"><img src="/assets/ucd.png" alt="UCD" height="34"></a>
+<div class="logos"><a href="https://www.ucd.ie" title="University College Dublin"><img src="/assets/ucd.png" alt="UCD" height="34"></a>
 <a href="https://www.plasma.org" title="Plasma"><img src="/assets/plasma.svg" alt="Plasma" height="18"></a></div>
 <div class="right">Testnet only · no real funds · for teaching purposes</div></footer>
 </main>
