@@ -35,7 +35,17 @@ app.post("/register", (req, res) => {
 // Machine-readable list for clients and agents.
 app.get("/apis.json", (req, res) => res.json(Object.values(students).map((s) => ({ ...s, ...status[s.address] }))));
 
-const ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#2563eb"/><text x="32" y="42" font-family="system-ui,sans-serif" font-size="26" font-weight="700" fill="#fff" text-anchor="middle">402</text></svg>`;
+// Logo: a podium on a gradient tile, with a gold coin on the winner's step.
+const ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fde68a"/><stop offset="1" stop-color="#f59e0b"/></linearGradient></defs>
+<rect width="64" height="64" rx="15" fill="url(#bg)"/>
+<rect x="9" y="37" width="15" height="17" rx="2.5" fill="#fff" fill-opacity=".7"/>
+<rect x="24.5" y="29" width="15" height="25" rx="2.5" fill="#fff"/>
+<rect x="40" y="42" width="15" height="12" rx="2.5" fill="#fff" fill-opacity=".5"/>
+<circle cx="32" cy="17" r="9" fill="url(#gold)" stroke="#fff" stroke-width="1.5"/>
+<text x="32" y="21.5" font-family="system-ui,sans-serif" font-size="12" font-weight="800" fill="#92400e" text-anchor="middle">$</text>
+</svg>`;
 // Token marks shown next to amounts (simplified USDC and ETH logos).
 const TOKEN = {
   USDC: `<svg class="token" viewBox="0 0 32 32" role="img" aria-label="USDC"><title>USDC</title><circle cx="16" cy="16" r="16" fill="#2775ca"/><text x="16" y="22.5" font-family="system-ui,sans-serif" font-size="19" font-weight="700" fill="#fff" text-anchor="middle">$</text></svg>`,
@@ -59,7 +69,7 @@ app.get("/", (req, res) => {
     <div class="value">${w.usdc == null ? "…" : `${w.address === funder ? `<span class="amt">${TOKEN.USDC}${Number(w.usdc).toFixed(2)}</span>` : ""}<span class="amt">${TOKEN.ETH}${Number(w.eth).toFixed(4)}</span>`}</div>
     ${w.low ? `<div class="note">${esc(w.low)}</div>` : ""}</div>`;
   res.send(`<!doctype html><html lang="en"><meta charset="utf-8"><meta http-equiv="refresh" content="10">
-<meta name="viewport" content="width=device-width, initial-scale=1"><title>Class Board</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>x402 Leaderboard</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <script>try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
 <style>
@@ -104,7 +114,7 @@ app.get("/", (req, res) => {
   footer { margin-top: 1rem; color: var(--muted); font-size: .8rem; }
 </style>
 <main>
-<header><img src="/favicon.svg" alt=""><h1>x402 class board</h1><button id="theme" type="button" aria-label="Toggle theme" title="Toggle theme"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button></header>
+<header><img src="/favicon.svg" alt=""><h1>x402 Leaderboard</h1><button id="theme" type="button" aria-label="Toggle theme" title="Toggle theme"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button></header>
 <div class="register">Register with <code>npm run register -- ${esc(boardUrl)}</code></div>
 <div class="grid">${stat("Registered", rows.length)}${stat("APIs up", up)}${stat("Paid requests", paid)}${stat("USDC moved", `<span class="amt">${TOKEN.USDC}${usdc(earned)}</span>`)}${wallet("Funder", wallets[funder]) || ""}${wallet("Facilitator gas", wallets[facilitator]) || ""}</div>
 <div class="table">${rows.length ? `<table><thead><tr><th>#</th><th>Name</th><th>API</th><th class="num">Paid requests</th><th class="num">USDC earned</th><th class="num">Payments made</th><th>Wallet</th></tr></thead><tbody>
