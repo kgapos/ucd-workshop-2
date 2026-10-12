@@ -57,7 +57,7 @@ const glyph = (color, label, body) =>
 const STAT = {
   registered: glyph("#0ea5e9", "Registered", `<circle cx="16" cy="12" r="4.5" fill="#fff"/><path d="M8.5 24c0-4.1 3.4-7 7.5-7s7.5 2.9 7.5 7z" fill="#fff"/>`),
   up: glyph("#16a34a", "APIs up", `<path d="M6.5 17h4.5l2.5-6 4 11 2.5-5h5.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`),
-  paid: glyph("#f59e0b", "Paid requests", `<path d="M17.5 6 9.5 18h6l-1 8 8-12h-6z" fill="#fff"/>`),
+  paid: glyph("#f59e0b", "Paid requests", `<path d="M10 7h12v18l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5z" fill="#fff"/><path d="M13 12h6M13 15.5h6M13 19h4" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/>`),
 };
 app.get("/favicon.svg", (req, res) => res.type("image/svg+xml").send(ICON));
 
@@ -123,7 +123,7 @@ app.get("/", (req, res) => {
   footer { margin-top: 1.25rem; color: var(--muted); font-size: .8rem; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem; }
   footer .right { text-align: right; }
   @media (max-width: 40rem) { footer { grid-template-columns: 1fr; text-align: center; } footer .right { text-align: center; } }
-  .logos { display: flex; justify-content: center; align-items: center; gap: 2rem; }
+  .logos { display: flex; justify-content: center; align-items: center; gap: 1.5rem; }
   .logos img { filter: var(--logo); opacity: .45; transition: opacity .2s; } .logos a:hover img { opacity: .9; }
 </style>
 <main>
@@ -137,7 +137,7 @@ ${rows.map((r, i) => `<tr><td>${i < 3 && r.count ? ["🥇", "🥈", "🥉"][i] :
 <td class="num">${r.balance == null ? "…" : BigInt(r.balance) === 0n ? `<span class="pill warn">not funded</span>` : `<span class="amt">${TOKEN.USDC}${Number(usdc(r.balance)).toFixed(3)}</span>`}</td>
 <td>${addr(r.address)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">Nobody has registered yet.</div>`}</div>
 <footer><div>Base Sepolia · refreshes every 10 seconds · <a href="/apis.json">apis.json</a></div>
-<div class="logos"><a href="https://www.ucd.ie" title="University College Dublin"><img src="/assets/ucd.png" alt="UCD" height="34"></a>
+<div class="logos"><span>Special thanks to</span><a href="https://www.ucd.ie" title="University College Dublin"><img src="/assets/ucd.png" alt="UCD" height="34"></a>
 <a href="https://www.plasma.org" title="Plasma"><img src="/assets/plasma.svg" alt="Plasma" height="18"></a></div>
 <div class="right">Testnet only · no real funds · for teaching purposes</div></footer>
 </main>
