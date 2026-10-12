@@ -10,10 +10,12 @@ const PORT = Number(process.env.BOARD_PORT || 8081);
 const CLASS_FACILITATOR = process.env.CLASS_FACILITATOR_URL; // handed to students when they register
 const FILE = process.env.STUDENTS_FILE || new URL("students.json", import.meta.url);
 const funder = process.env.FUNDER_PRIVATE_KEY && privateKeyToAccount(process.env.FUNDER_PRIVATE_KEY).address;
+const facilitator = process.env.FACILITATOR_PRIVATE_KEY && privateKeyToAccount(process.env.FACILITATOR_PRIVATE_KEY).address;
 const transfer = parseAbiItem("event Transfer(address indexed from, address indexed to, uint256 value)");
 
 const students = existsSync(FILE) ? JSON.parse(readFileSync(FILE, "utf8")) : {}; // keyed by address
 const status = {}; // address -> { up, note, received, count, spent, paidOut }
+const wallets = {}; // address -> { address, usdc, eth, low }
 
 const app = express();
 app.set("trust proxy", true); // behind a reverse proxy, req.protocol comes from X-Forwarded-Proto
@@ -33,27 +35,83 @@ app.post("/register", (req, res) => {
 // Machine-readable list for clients and agents.
 app.get("/apis.json", (req, res) => res.json(Object.values(students).map((s) => ({ ...s, ...status[s.address] }))));
 
+const ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#2563eb"/><text x="32" y="42" font-family="system-ui,sans-serif" font-size="26" font-weight="700" fill="#fff" text-anchor="middle">402</text></svg>`;
+app.get("/favicon.svg", (req, res) => res.type("image/svg+xml").send(ICON));
+
 app.get("/", (req, res) => {
   const rows = Object.values(students)
     .map((s) => ({ ...s, ...status[s.address] }))
     .sort((a, b) => (b.count || 0) - (a.count || 0));
   const esc = (v) => String(v ?? "").replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
-  res.send(`<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="10">
+  const usdc = (v) => formatUnits(BigInt(v || 0), 6);
+  const boardUrl = `${req.protocol}://${req.get("host")}`;
+  const up = rows.filter((r) => r.up).length;
+  const paid = rows.reduce((n, r) => n + (r.count || 0), 0);
+  const earned = rows.reduce((n, r) => n + BigInt(r.received || 0), 0n);
+  const addr = (a) => `<a href="${EXPLORER}/address/${a}#tokentxns"><code>${a.slice(0, 6)}…${a.slice(-4)}</code></a>`;
+  const stat = (label, value) => `<div class="card"><div class="label">${label}</div><div class="value">${value}</div></div>`;
+  const wallet = (label, w) => w && `<div class="card wallet${w.low ? " low" : ""}"><div class="label">${label} ${addr(w.address)}</div>
+    <div class="value">${w.usdc == null ? "…" : `${w.address === funder ? `${Number(w.usdc).toFixed(2)} <small>USDC</small> · ` : ""}${Number(w.eth).toFixed(4)} <small>ETH</small>`}</div>
+    ${w.low ? `<div class="note">${esc(w.low)}</div>` : ""}</div>`;
+  res.send(`<!doctype html><html lang="en"><meta charset="utf-8"><meta http-equiv="refresh" content="10">
 <meta name="viewport" content="width=device-width, initial-scale=1"><title>Class Board</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
 <style>
-  :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
-  body { margin: 2rem auto; max-width: 70rem; padding: 0 1rem; }
-  table { border-collapse: collapse; width: 100%; } td, th { padding: .4rem .6rem; text-align: left; border-bottom: 1px solid #8884; }
-  .up { color: #1a7f37; } .down { color: #cf222e; } code { font-size: .85em; } .num { text-align: right; font-variant-numeric: tabular-nums; }
+  :root { --bg: #f6f7f9; --panel: #fff; --text: #111827; --muted: #6b7280; --border: #e5e7eb; --accent: #2563eb;
+    --up: #15803d; --up-bg: #dcfce7; --down: #b91c1c; --down-bg: #fee2e2; --warn: #b45309; --warn-bg: #fef3c7; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0b0f17; --panel: #131a26; --text: #e5e7eb;
+    --muted: #9ca3af; --border: #243044; --accent: #60a5fa; --up: #4ade80; --up-bg: #14532d55; --down: #f87171; --down-bg: #7f1d1d55;
+    --warn: #fbbf24; --warn-bg: #78350f55; color-scheme: dark; } }
+  :root[data-theme="dark"] { --bg: #0b0f17; --panel: #131a26; --text: #e5e7eb; --muted: #9ca3af; --border: #243044; --accent: #60a5fa;
+    --up: #4ade80; --up-bg: #14532d55; --down: #f87171; --down-bg: #7f1d1d55; --warn: #fbbf24; --warn-bg: #78350f55; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 72rem; margin: 0 auto; padding: 2rem 1rem 3rem; }
+  header { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+  header img { width: 2.25rem; height: 2.25rem; }
+  h1 { font-size: 1.6rem; margin: 0; letter-spacing: -.01em; flex: 1; }
+  a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+  code { font: .85em ui-monospace, SFMono-Regular, Menlo, monospace; }
+  button { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--border); border-radius: .5rem; padding: .3rem .7rem; cursor: pointer; }
+  .register { margin: 1rem 0 1.5rem; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; color: var(--muted); }
+  .register code { background: var(--panel); border: 1px solid var(--border); border-radius: .5rem; padding: .35rem .6rem; color: var(--text); overflow-wrap: anywhere; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .75rem; margin-bottom: .75rem; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: .75rem; padding: .8rem 1rem; }
+  .label { color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+  .label a { text-transform: none; letter-spacing: 0; }
+  .value { font-size: 1.5rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+  .wallet .value { font-size: 1.15rem; } small { color: var(--muted); font-weight: 500; }
+  .wallets { grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); margin-bottom: 1.5rem; }
+  .low { border-color: var(--warn); background: var(--warn-bg); } .note { color: var(--warn); font-size: .85rem; }
+  .table { background: var(--panel); border: 1px solid var(--border); border-radius: .75rem; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; white-space: nowrap; }
+  th, td { padding: .6rem .9rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+  tr:last-child td { border-bottom: 0; } tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pill { display: inline-block; border-radius: 999px; padding: .1rem .55rem; font-size: .8rem; font-weight: 600; margin-right: .4rem; }
+  .pill.up { color: var(--up); background: var(--up-bg); } .pill.down { color: var(--down); background: var(--down-bg); }
+  .empty { padding: 2rem; text-align: center; color: var(--muted); }
+  footer { margin-top: 1rem; color: var(--muted); font-size: .8rem; }
 </style>
-<h1>x402 class board</h1>
-<p>${rows.length} registered, ${rows.filter((r) => r.up).length} APIs up. Register with <code>npm run register -- ${esc(`${req.protocol}://${req.get("host")}`)}</code></p>
-<table><tr><th>#</th><th>Name</th><th>API</th><th class="num">Paid requests received</th><th class="num">USDC earned</th><th class="num">Payments made</th><th>Wallet</th></tr>
-${rows.map((r, i) => `<tr><td>${i + 1}</td><td>${esc(r.name)}</td>
-<td class="${r.up ? "up" : "down"}">${r.up ? "● up" : "○ " + esc(r.note || "down")} <a href="${esc(r.url)}">${esc(r.url.replace(/^https?:\/\//, "").slice(0, 32))}</a></td>
-<td class="num">${r.count || 0}</td><td class="num">${formatUnits(BigInt(r.received || 0), 6)}</td><td class="num">${r.paidOut || 0}</td>
-<td><a href="${EXPLORER}/address/${r.address}#tokentxns"><code>${r.address.slice(0, 10)}…</code></a></td></tr>`).join("")}
-</table>`);
+<main>
+<header><img src="/favicon.svg" alt=""><h1>x402 class board</h1><button id="theme" type="button">Toggle theme</button></header>
+<div class="register">Register with <code>npm run register -- ${esc(boardUrl)}</code></div>
+<div class="grid">${stat("Registered", rows.length)}${stat("APIs up", up)}${stat("Paid requests", paid)}${stat("USDC moved", usdc(earned))}</div>
+${funder || facilitator ? `<div class="grid wallets">${wallet("Funder", wallets[funder]) || ""}${wallet("Facilitator gas", wallets[facilitator]) || ""}</div>` : ""}
+<div class="table">${rows.length ? `<table><thead><tr><th>#</th><th>Name</th><th>API</th><th class="num">Paid requests</th><th class="num">USDC earned</th><th class="num">Payments made</th><th>Wallet</th></tr></thead><tbody>
+${rows.map((r, i) => `<tr><td>${i < 3 && r.count ? ["🥇", "🥈", "🥉"][i] : i + 1}</td><td>${esc(r.name)}</td>
+<td><span class="pill ${r.up ? "up" : "down"}">${r.up ? "up" : esc(r.note || "down")}</span><a href="${esc(r.url)}">${esc(r.url.replace(/^https?:\/\//, "").slice(0, 32))}</a></td>
+<td class="num">${r.count || 0}</td><td class="num">${usdc(r.received)}</td><td class="num">${r.paidOut || 0}</td>
+<td>${addr(r.address)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">Nobody has registered yet.</div>`}</div>
+<footer>Base Sepolia · refreshes every 10 seconds · <a href="/apis.json">apis.json</a></footer>
+</main>
+<script>document.getElementById("theme").onclick = () => {
+  const root = document.documentElement, dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("theme", root.dataset.theme); } catch {}
+};</script>`);
 });
 
 // Is each API reachable? A private Codespaces port answers with a login redirect instead of JSON.
@@ -92,8 +150,25 @@ async function countPayments() {
   }
 }
 
+// Instructor wallet balances, with a warning when they run low.
+// ponytail: fixed thresholds, enough for one more student (funder) or a few hundred settlements (facilitator).
+const balanceOf = parseAbiItem("function balanceOf(address) view returns (uint256)");
+async function checkWallets() {
+  for (const [address, low] of [[funder, (u, e) => u < 1 || e < 0.0005], [facilitator, (u, e) => e < 0.002]]) {
+    if (!address) continue;
+    const [u, e] = await Promise.all([
+      publicClient.readContract({ address: USDC, abi: [balanceOf], functionName: "balanceOf", args: [address] }),
+      publicClient.getBalance({ address }),
+    ]);
+    const w = { address, usdc: formatUnits(u, 6), eth: formatUnits(e, 18) };
+    w.low = low(Number(w.usdc), Number(w.eth)) ? "Running low, top it up" : "";
+    wallets[address] = w;
+  }
+}
+
 const every = (ms, fn) => { const run = () => fn().catch((e) => console.error(fn.name, e.shortMessage || e.message)); run(); setInterval(run, ms); };
 every(15_000, checkApis);
 every(10_000, countPayments);
+every(30_000, checkWallets);
 
 app.listen(PORT, () => console.log(`Class board on ${publicUrl(PORT)} (make port ${PORT} public)`));
