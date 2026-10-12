@@ -4,8 +4,11 @@
   "hostRequirements": {
     "cpus": 2
   },
-  "postCreateCommand": "npm ci",
-  "postAttachCommand": "gh codespace ports visibility 4021:public -c \"$CODESPACE_NAME\" >/dev/null 2>&1 || true",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "updateContentCommand": "npm ci",
+  "postStartCommand": "gh codespace ports visibility 4021:public -c \"$CODESPACE_NAME\" || true",
   "forwardPorts": [
     4021
   ],
