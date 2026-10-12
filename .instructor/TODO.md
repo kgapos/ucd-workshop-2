@@ -25,7 +25,8 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 - [x] Set `CLASS_FACILITATOR_URL=https://facilitator.kgapos.com` in `.instructor/.env` and run `docker compose up -d`.
 - [x] Verify from outside: `curl https://facilitator.kgapos.com/supported` and open `https://ucd.kgapos.com`.
       Checked on 2026-10-12: a payment settled through the facilitator, and a load test passed 40/40 at concurrency 20.
-- [ ] Decide on `RPC_URL`: keep the public endpoints, or add an RPC provider key or your own node first in the list.
+- [ ] Add the two extra public RPCs (Tenderly, OnFinality) to `RPC_URL` in the homelab `.instructor/.env`, as in the
+      instructor README, then run `docker compose up -d`.
 
 ### Rehearsal (the day before)
 
@@ -40,12 +41,10 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 
 ### Repository
 
-- [ ] Make the repository public, so that students can create Codespaces from it on their own accounts.
+- [x] Make the repository public, so that students can create Codespaces from it on their own accounts.
       Nothing secret is committed. The `solution` branch is local only and stays private until you push it.
-- [ ] Optionally, add a description, topics and a banner image like the previous workshop.
-- [ ] Back up the local `solution` branch (for example as a bundle: `git bundle create solution.bundle solution`),
-      because it exists only on this laptop.
-- [ ] Drop the two redundant stash entries left over from development (`git stash list`, then `git stash drop`).
+- [x] Optionally, add a description, topics and a banner image like the previous workshop.
+- [x] Drop the two redundant stash entries left over from development (`git stash list`, then `git stash drop`).
 
 ### Slides
 

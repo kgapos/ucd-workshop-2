@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://www.plasma.org">
+    <img src=".github/project-banner.png" alt="Plasma and UCD">
+  </a>
+</p>
+
 ## Pay-per-request APIs with x402 and Stablecoins
 
 > This repository was created for the "Pay-per-request APIs with x402 and Stablecoins" workshop in UCD

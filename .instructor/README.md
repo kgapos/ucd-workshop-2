@@ -41,7 +41,7 @@ A few days ahead, because faucets limit how often you can claim.
 4. Set `RPC_URL` in `.instructor/.env`. It takes one or more comma-separated Base Sepolia endpoints,
    and requests fail over from one to the next. The default public RPC (`sepolia.base.org`)
    rate-limits under load, so put a better endpoint first, for example
-   `RPC_URL=https://base-sepolia-rpc.publicnode.com,https://sepolia.base.org`.
+   `RPC_URL=https://base-sepolia-rpc.publicnode.com,https://sepolia.base.org,https://base-sepolia.gateway.tenderly.co,https://base-sepolia.api.onfinality.io/public`.
 
 5. Do a rehearsal (see [On the day](#on-the-day)), then run the load test at class size:
 
