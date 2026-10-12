@@ -36,6 +36,11 @@ app.post("/register", (req, res) => {
 app.get("/apis.json", (req, res) => res.json(Object.values(students).map((s) => ({ ...s, ...status[s.address] }))));
 
 const ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#2563eb"/><text x="32" y="42" font-family="system-ui,sans-serif" font-size="26" font-weight="700" fill="#fff" text-anchor="middle">402</text></svg>`;
+// Token marks shown next to amounts (simplified USDC and ETH logos).
+const TOKEN = {
+  USDC: `<svg class="token" viewBox="0 0 32 32" role="img" aria-label="USDC"><title>USDC</title><circle cx="16" cy="16" r="16" fill="#2775ca"/><text x="16" y="22.5" font-family="system-ui,sans-serif" font-size="19" font-weight="700" fill="#fff" text-anchor="middle">$</text></svg>`,
+  ETH: `<svg class="token" viewBox="0 0 32 32" role="img" aria-label="ETH"><title>ETH</title><circle cx="16" cy="16" r="16" fill="#627eea"/><path fill="#fff" fill-opacity=".6" d="M16 4v8.9l7.5 3.3z"/><path fill="#fff" d="M16 4 8.5 16.2l7.5-3.3z"/><path fill="#fff" fill-opacity=".6" d="M16 22v6l7.5-10.4z"/><path fill="#fff" d="M16 28v-6l-7.5-4.4z"/><path fill="#fff" fill-opacity=".2" d="m16 20.6 7.5-4.4-7.5-3.3z"/><path fill="#fff" fill-opacity=".6" d="m8.5 16.2 7.5 4.4v-7.7z"/></svg>`,
+};
 app.get("/favicon.svg", (req, res) => res.type("image/svg+xml").send(ICON));
 
 app.get("/", (req, res) => {
@@ -51,7 +56,7 @@ app.get("/", (req, res) => {
   const addr = (a) => `<a href="${EXPLORER}/address/${a}#tokentxns"><code>${a.slice(0, 6)}…${a.slice(-4)}</code></a>`;
   const stat = (label, value) => `<div class="card"><div class="label">${label}</div><div class="value">${value}</div></div>`;
   const wallet = (label, w) => w && `<div class="card wallet${w.low ? " low" : ""}"><div class="label">${label} ${addr(w.address)}</div>
-    <div class="value">${w.usdc == null ? "…" : `${w.address === funder ? `${Number(w.usdc).toFixed(2)} <small>USDC</small> · ` : ""}${Number(w.eth).toFixed(4)} <small>ETH</small>`}</div>
+    <div class="value">${w.usdc == null ? "…" : `${w.address === funder ? `<span class="amt">${TOKEN.USDC}${Number(w.usdc).toFixed(2)}</span>` : ""}<span class="amt">${TOKEN.ETH}${Number(w.eth).toFixed(4)}</span>`}</div>
     ${w.low ? `<div class="note">${esc(w.low)}</div>` : ""}</div>`;
   res.send(`<!doctype html><html lang="en"><meta charset="utf-8"><meta http-equiv="refresh" content="10">
 <meta name="viewport" content="width=device-width, initial-scale=1"><title>Class Board</title>
@@ -82,7 +87,8 @@ app.get("/", (req, res) => {
   .label { color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
   .label a { text-transform: none; letter-spacing: 0; }
   .value { font-size: 1.5rem; font-weight: 650; font-variant-numeric: tabular-nums; }
-  .wallet .value { font-size: 1.15rem; } small { color: var(--muted); font-weight: 500; }
+  .wallet .value { font-size: 1.15rem; display: flex; gap: 1.25rem; flex-wrap: wrap; }
+  .amt { display: inline-flex; align-items: center; gap: .4rem; } .token { width: 1.1em; height: 1.1em; flex: none; } small { color: var(--muted); font-weight: 500; }
   .wallets { grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); margin-bottom: 1.5rem; }
   .low { border-color: var(--warn); background: var(--warn-bg); } .note { color: var(--warn); font-size: .85rem; }
   .table { background: var(--panel); border: 1px solid var(--border); border-radius: .75rem; overflow-x: auto; }
@@ -99,7 +105,7 @@ app.get("/", (req, res) => {
 <main>
 <header><img src="/favicon.svg" alt=""><h1>x402 class board</h1><button id="theme" type="button" aria-label="Toggle theme" title="Toggle theme"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button></header>
 <div class="register">Register with <code>npm run register -- ${esc(boardUrl)}</code></div>
-<div class="grid">${stat("Registered", rows.length)}${stat("APIs up", up)}${stat("Paid requests", paid)}${stat("USDC moved", usdc(earned))}</div>
+<div class="grid">${stat("Registered", rows.length)}${stat("APIs up", up)}${stat("Paid requests", paid)}${stat("USDC moved", `<span class="amt">${TOKEN.USDC}${usdc(earned)}</span>`)}</div>
 ${funder || facilitator ? `<div class="grid wallets">${wallet("Funder", wallets[funder]) || ""}${wallet("Facilitator gas", wallets[facilitator]) || ""}</div>` : ""}
 <div class="table">${rows.length ? `<table><thead><tr><th>#</th><th>Name</th><th>API</th><th class="num">Paid requests</th><th class="num">USDC earned</th><th class="num">Payments made</th><th>Wallet</th></tr></thead><tbody>
 ${rows.map((r, i) => `<tr><td>${i < 3 && r.count ? ["🥇", "🥈", "🥉"][i] : i + 1}</td><td>${esc(r.name)}</td>
