@@ -7,6 +7,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { publicClient, USDC, EXPLORER, publicUrl } from "../config.js";
 
 const PORT = Number(process.env.BOARD_PORT || 8080);
+const CLASS_FACILITATOR = process.env.CLASS_FACILITATOR_URL; // handed to students when they register
 const FILE = new URL("students.json", import.meta.url);
 const funder = process.env.FUNDER_PRIVATE_KEY && privateKeyToAccount(process.env.FUNDER_PRIVATE_KEY).address;
 const transfer = parseAbiItem("event Transfer(address indexed from, address indexed to, uint256 value)");
@@ -25,7 +26,7 @@ app.post("/register", (req, res) => {
   for (const [a, s] of Object.entries(students)) if (s.name === name) delete students[a]; // re-registering replaces
   students[getAddress(address)] = { name, address: getAddress(address), url: url.replace(/\/$/, "") };
   writeFileSync(FILE, JSON.stringify(students, null, 2));
-  res.json({ ok: true });
+  res.json({ ok: true, facilitator: CLASS_FACILITATOR });
 });
 
 // Machine-readable list for clients and agents.

@@ -1,11 +1,13 @@
 // Tops up every student wallet with testnet USDC (and a little ETH) from the instructor's wallet.
-// Safe to re-run: wallets that already hold the target amount are skipped.
+// Safe to re-run: every successful transfer is recorded in instructor/funded.json and not repeated.
+// (Balances alone are not enough: a load-balanced RPC can return a stale balance right after a transfer.)
 //
-// Usage: npm run fund -- <source> [--dry-run]
+// Usage: npm run fund -- <source> [--dry-run] [--topup]
+//   --topup ignores funded.json and tops every wallet back up to the target, e.g. for a second session.
 //   <source> is any file or URL containing addresses, e.g. the board (https://...-8080.app.github.dev/apis.json),
 //   instructor/students.json, or a CSV exported from a form. Every 0x... address found in it is funded.
 // Env (instructor/.env): FUNDER_PRIVATE_KEY, USDC_AMOUNT (default 1), ETH_AMOUNT (default 0.0005), BATCH (default 10)
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { createWalletClient, http, erc20Abi, getAddress, parseUnits, parseEther, formatUnits, formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { baseSepolia } from "viem/chains";
@@ -13,8 +15,11 @@ import { publicClient, USDC, EXPLORER } from "../config.js";
 
 const [source] = process.argv.slice(2).filter((a) => !a.startsWith("--"));
 const dryRun = process.argv.includes("--dry-run");
+const topup = process.argv.includes("--topup");
+const LEDGER = new URL("funded.json", import.meta.url);
+const ledger = existsSync(LEDGER) ? JSON.parse(readFileSync(LEDGER, "utf8")) : {}; // "address:kind" -> tx hash
 if (!source) {
-  console.error("Usage: npm run fund -- <file-or-url> [--dry-run]");
+  console.error("Usage: npm run fund -- <file-or-url> [--dry-run] [--topup]");
   process.exit(1);
 }
 if (!process.env.FUNDER_PRIVATE_KEY) {
@@ -37,8 +42,8 @@ const usdcOf = (address) => publicClient.readContract({ address: USDC, abi: erc2
 const jobs = [];
 for (const address of addresses) {
   const [usdc, eth] = await Promise.all([usdcOf(address), publicClient.getBalance({ address })]);
-  if (usdc < usdcTarget) jobs.push({ address, kind: "USDC", amount: usdcTarget - usdc });
-  if (eth < ethTarget) jobs.push({ address, kind: "ETH", amount: ethTarget - eth });
+  if (usdc < usdcTarget && (topup || !ledger[`${address}:USDC`])) jobs.push({ address, kind: "USDC", amount: usdcTarget - usdc });
+  if (eth < ethTarget && (topup || !ledger[`${address}:ETH`])) jobs.push({ address, kind: "ETH", amount: ethTarget - eth });
 }
 const need = (kind) => jobs.filter((j) => j.kind === kind).reduce((sum, j) => sum + j.amount, 0n);
 const [haveUsdc, haveEth] = await Promise.all([usdcOf(funder.address), publicClient.getBalance({ address: funder.address })]);
@@ -89,6 +94,8 @@ for (let i = 0; i < jobs.length; i += batchSize) {
     try {
       const r = await withRetry(() => publicClient.waitForTransactionReceipt({ hash, timeout: 60_000 }));
       if (r.status !== "success") throw new Error("reverted");
+      ledger[`${job.address}:${job.kind}`] = hash;
+      writeFileSync(LEDGER, JSON.stringify(ledger, null, 2));
       console.log(`  ok   ${job.kind.padEnd(4)} ${job.address} ${EXPLORER}/tx/${hash}`);
     } catch (e) {
       failed.push(job);
