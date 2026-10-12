@@ -1,11 +1,14 @@
 ## Instructor guide
 
 Everything the instructor runs: funding, the class board, a self-hosted facilitator and a load test.
-These tools live in the same repository as the student code and use the same `npm ci`.
+These tools live in the same repository as the student code and use the same `npm ci`. The folder is
+hidden in the Codespaces file explorer to keep the students' view tidy. Open it from the terminal,
+for example `code .instructor/README.md`.
 
 ## Table of Contents
 
 - [Before the workshop](#before-the-workshop)
+- [Hosting on a server with Docker](#hosting-on-a-server-with-docker)
 - [On the day](#on-the-day)
 - [Releasing the reference solution](#releasing-the-reference-solution)
 - [Tools](#tools)
@@ -17,13 +20,13 @@ A few days ahead, because faucets limit how often you can claim.
 
 1. Open your own Codespace on this repository, or use any machine with Node.js 22+ and run `npm ci`.
 
-2. Create two wallets. Their keys go to `instructor/.env`, which git ignores.
+2. Create two wallets. Their keys go to `.instructor/.env`, which git ignores.
 
    ```bash
    # Sends USDC and ETH to students
-   npm run wallet -- FUNDER_PRIVATE_KEY instructor/.env
+   npm run wallet -- FUNDER_PRIVATE_KEY .instructor/.env
    # Pays the gas for every settlement in class
-   npm run wallet -- FACILITATOR_PRIVATE_KEY instructor/.env
+   npm run wallet -- FACILITATOR_PRIVATE_KEY .instructor/.env
    ```
 
 3. Fund them on Base Sepolia:
@@ -35,9 +38,10 @@ A few days ahead, because faucets limit how often you can claim.
 
    Check them with `npm run balance -- <address>`.
 
-4. Set `RPC_URL` in `instructor/.env` to a dedicated Base Sepolia RPC endpoint: your own node, or a
-   provider of your choice. The default public RPC (`sepolia.base.org`) rate-limits under load.
-   It also caps `eth_getLogs` at 200 blocks, which the board already works around.
+4. Set `RPC_URL` in `.instructor/.env`. It takes one or more comma-separated Base Sepolia endpoints,
+   and requests fail over from one to the next. The default public RPC (`sepolia.base.org`)
+   rate-limits under load, so put a better endpoint first, for example
+   `RPC_URL=https://base-sepolia-rpc.publicnode.com,https://sepolia.base.org`.
 
 5. Do a rehearsal (see [On the day](#on-the-day)), then run the load test at class size:
 
@@ -48,15 +52,41 @@ A few days ahead, because faucets limit how often you can claim.
 6. In [your Codespaces settings](https://github.com/settings/codespaces), raise the default idle
    timeout (up to 240 minutes) so your Codespace does not stop mid-session.
 
-`instructor/.env` reference (see [`.env.example`](.env.example)):
+`.instructor/.env` reference (see [`.env.example`](.env.example)):
 
 ```bash
 FUNDER_PRIVATE_KEY=0x...
 FACILITATOR_PRIVATE_KEY=0x...
-RPC_URL=https://...                       # dedicated Base Sepolia RPC
+RPC_URL=https://...,https://...           # one or more Base Sepolia RPCs, comma-separated
 CLASS_FACILITATOR_URL=https://...-4022.app.github.dev   # public URL of your facilitator, handed to students
 # USDC_AMOUNT=1      ETH_AMOUNT=0.0005    BATCH=10
 ```
+
+## Hosting on a server with Docker
+
+Instead of your Codespace, you can run the facilitator and the board on any Docker host, for example
+a homelab. They keep running when your laptop sleeps, and they don't depend on Codespaces timeouts.
+
+```bash
+git clone https://github.com/kgapos/ucd-workshop-2 && cd ucd-workshop-2
+# create .instructor/.env as above, then:
+cd .instructor/infrastructure
+docker compose up -d --build
+docker compose ps        # both services should become "healthy"
+docker compose logs -f   # settlements are logged as "settled #N <tx hash>"
+```
+
+This publishes the facilitator on port 4022 and the board on port 8080. Put both behind HTTPS with
+your reverse proxy or tunnel of choice, then set `CLASS_FACILITATOR_URL` to the facilitator's public
+URL and restart the board with `docker compose up -d`. Registrations are stored in the `board-data`
+volume and survive restarts.
+
+> :warning: Anyone who knows the facilitator URL can make it settle Base Sepolia payments, which
+> costs its wallet testnet gas. Keep only a little ETH in it, and share the URL only with the class.
+
+We do not run our own Base Sepolia node. The official node needs 32 GB+ RAM, a large NVMe disk, its
+own L1 Sepolia RPC and beacon endpoints, and hours to days to sync. A couple of public endpoints in
+`RPC_URL` handled 40 concurrent payments without errors in testing.
 
 ## On the day
 
@@ -73,7 +103,7 @@ Make both ports public, so students' servers and browsers can reach them:
 gh codespace ports visibility 4022:public 8080:public -c "$CODESPACE_NAME"
 ```
 
-Put the facilitator's public URL in `CLASS_FACILITATOR_URL` (in `instructor/.env`) before students
+Put the facilitator's public URL in `CLASS_FACILITATOR_URL` (in `.instructor/.env`) before students
 register. The board hands it to every student, and `npm run register` saves it to their `.env`.
 
 Then, during Part 0:
@@ -87,7 +117,7 @@ Then, during Part 0:
    ```
 
    Re-run the second command whenever more students have registered. Every successful transfer is
-   recorded in `instructor/funded.json`, so nobody gets paid twice.
+   recorded in `.instructor/funded.json`, so nobody gets paid twice.
 
 3. Keep the board open on the projector. It refreshes every 10 seconds.
 
@@ -111,8 +141,8 @@ Students then run `git pull` and get `completed/` without conflicts, even if the
 
 | Command | What it does |
 |---|---|
-| `npm run fund -- <source> [--dry-run] [--topup]` | Sends USDC (`USDC_AMOUNT`) and ETH (`ETH_AMOUNT`) to every address found in `<source>`. `<source>` can be the board's `/apis.json`, `instructor/students.json`, or any CSV or text file: every `0x...` address in it is used. Sends in batches of `BATCH` with consecutive nonces, waits for receipts, retries failed broadcasts, and stops rather than leave a nonce gap. `--topup` ignores the ledger and tops everyone back up to the target. |
-| `npm run board` | The class board on port 8080. `POST /register` adds a student, `GET /apis.json` lists everyone with their status, `GET /` is the live page. It checks every API every 15 seconds and counts USDC transfers on-chain every 10 seconds. Your funding transfers are not counted. Registrations persist in `instructor/students.json`. Set `FROM_BLOCK` to choose where counting starts (default: about 2 hours back). |
+| `npm run fund -- <source> [--dry-run] [--topup]` | Sends USDC (`USDC_AMOUNT`) and ETH (`ETH_AMOUNT`) to every address found in `<source>`. `<source>` can be the board's `/apis.json`, `.instructor/students.json`, or any CSV or text file: every `0x...` address in it is used. Sends in batches of `BATCH` with consecutive nonces, waits for receipts, retries failed broadcasts, and stops rather than leave a nonce gap. `--topup` ignores the ledger and tops everyone back up to the target. |
+| `npm run board` | The class board on port 8080. `POST /register` adds a student, `GET /apis.json` lists everyone with their status, `GET /` is the live page. It checks every API every 15 seconds and counts USDC transfers on-chain every 10 seconds. Your funding transfers are not counted. Registrations persist in `.instructor/students.json`. Set `FROM_BLOCK` to choose where counting starts (default: about 2 hours back). |
 | `npm run facilitator` | A self-hosted x402 facilitator for Base Sepolia on port 4022 (`/verify`, `/settle`, `/supported`). It pays gas from `FACILITATOR_PRIVATE_KEY`. |
 | `npm run loadtest -- <paid-url> [--requests N] [--concurrency C]` | Sends N real paid requests, C at a time, and reports latency percentiles and a breakdown of outcomes and errors. It pays from `PRIVATE_KEY` in `.env`, or `LOADTEST_PRIVATE_KEY`. Each successful request costs its price in testnet USDC. |
 

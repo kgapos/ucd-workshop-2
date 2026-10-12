@@ -1,0 +1,39 @@
+# Class facilitator and board for a homelab or any Docker host.
+#   cd .instructor/infrastructure && docker compose up -d --build
+# Reads keys and settings from .instructor/.env. Put both ports behind your HTTPS reverse proxy or tunnel.
+name: x402-workshop
+
+x-common: &common
+  build:
+    context: ../..
+    dockerfile: .instructor/infrastructure/Dockerfile
+  image: x402-workshop:local
+  env_file: ../.env
+  restart: unless-stopped
+  logging:
+    options: { max-size: "10m", max-file: "3" }
+
+services:
+  facilitator:
+    <<: *common
+    command: ["node", ".instructor/facilitator.js"]
+    ports: ["4022:4022"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:4022/supported').then(r => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+
+  board:
+    <<: *common
+    command: ["node", ".instructor/board.js"]
+    environment:
+      STUDENTS_FILE: /data/students.json
+    ports: ["8080:8080"]
+    volumes: ["board-data:/data"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:8080/apis.json').then(r => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+
+volumes:
+  board-data:

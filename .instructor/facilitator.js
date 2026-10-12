@@ -3,25 +3,25 @@
 // so for a full classroom run this instead and give students its URL as FACILITATOR_URL.
 //
 // Usage: npm run facilitator   (needs FACILITATOR_PRIVATE_KEY with a little Base Sepolia ETH for gas;
-//        set RPC_URL to a dedicated endpoint, the public one rate-limits)
+//        set RPC_URL to one or more comma-separated endpoints, the public default rate-limits)
 import express from "express";
-import { createWalletClient, http, publicActions, nonceManager } from "viem";
+import { createWalletClient, publicActions, nonceManager } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { baseSepolia } from "viem/chains";
 import { x402Facilitator } from "@x402/core/facilitator";
 import { toFacilitatorEvmSigner } from "@x402/evm";
 import { ExactEvmScheme } from "@x402/evm/exact/facilitator";
-import { NETWORK, publicUrl } from "../config.js";
+import { NETWORK, publicUrl, transport } from "../config.js";
 
 if (!process.env.FACILITATOR_PRIVATE_KEY) {
-  console.error("Set FACILITATOR_PRIVATE_KEY in instructor/.env");
+  console.error("Set FACILITATOR_PRIVATE_KEY in .instructor/.env");
   process.exit(1);
 }
 const PORT = Number(process.env.FACILITATOR_PORT || 4022);
 
 // The nonce manager hands out nonces locally, so concurrent settlements do not collide.
 const account = privateKeyToAccount(process.env.FACILITATOR_PRIVATE_KEY, { nonceManager });
-const viem = createWalletClient({ account, chain: baseSepolia, transport: http(process.env.RPC_URL) }).extend(publicActions);
+const viem = createWalletClient({ account, chain: baseSepolia, transport }).extend(publicActions);
 
 const signer = toFacilitatorEvmSigner({
   address: account.address,

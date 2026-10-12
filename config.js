@@ -1,5 +1,5 @@
 // Shared settings for every script in this repo.
-import { createPublicClient, http } from "viem";
+import { createPublicClient, fallback, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { baseSepolia } from "viem/chains";
 
@@ -9,7 +9,10 @@ export const EXPLORER = "https://sepolia.basescan.org";
 export const FACILITATOR_URL = process.env.FACILITATOR_URL || "https://x402.org/facilitator";
 export const PORT = Number(process.env.PORT || 4021);
 
-export const publicClient = createPublicClient({ chain: baseSepolia, transport: http(process.env.RPC_URL) });
+// RPC_URL may list several endpoints, comma-separated: requests fail over from one to the next.
+const rpcUrls = (process.env.RPC_URL || "").split(",").map((u) => u.trim()).filter(Boolean);
+export const transport = rpcUrls.length > 1 ? fallback(rpcUrls.map((u) => http(u))) : http(rpcUrls[0]);
+export const publicClient = createPublicClient({ chain: baseSepolia, transport });
 
 export function account() {
   if (!process.env.PRIVATE_KEY) {

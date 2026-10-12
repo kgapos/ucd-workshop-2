@@ -13,10 +13,10 @@
     "server": "node --env-file-if-exists=.env --watch starter/server.js",
     "client": "node --env-file-if-exists=.env starter/client.js",
     "agent": "node --env-file-if-exists=.env starter/agent.js",
-    "fund": "node --env-file-if-exists=instructor/.env instructor/fund.js",
-    "board": "node --env-file-if-exists=instructor/.env instructor/board.js",
-    "loadtest": "node --env-file-if-exists=.env instructor/loadtest.js",
-    "facilitator": "node --env-file-if-exists=instructor/.env instructor/facilitator.js"
+    "fund": "node --env-file-if-exists=.instructor/.env .instructor/fund.js",
+    "board": "node --env-file-if-exists=.instructor/.env .instructor/board.js",
+    "loadtest": "node --env-file-if-exists=.env .instructor/loadtest.js",
+    "facilitator": "node --env-file-if-exists=.instructor/.env .instructor/facilitator.js"
   },
   "dependencies": {
     "@x402/core": "2.28.0",

@@ -1,5 +1,5 @@
 // Creates a fresh testnet wallet and saves its private key to .env.
-// Usage: npm run wallet  (instructors: npm run wallet -- FUNDER_PRIVATE_KEY instructor/.env)
+// Usage: npm run wallet  (instructors: npm run wallet -- FUNDER_PRIVATE_KEY .instructor/.env)
 import { existsSync, readFileSync, appendFileSync } from "node:fs";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 

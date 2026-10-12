@@ -299,7 +299,7 @@ Ordered from very simple to hard. Do them in any order you like.
 | 9 | Hard | Surge pricing: make the price depend on how busy your API is. Hint: the price is computed again when the paid retry arrives, and it must match what the client signed. How do you keep it stable? |
 | 10 | Hard | Write an agent that buys the cheapest offer from every API on the board, without paying anyone twice, until its budget runs out. |
 | 11 | Hard | Accept **EURC** as well as USDC on the same route (`accepts` can be an array). The client has to allow the extra asset too. |
-| 12 | Expert | Run your own facilitator (see [`instructor/facilitator.js`](instructor/facilitator.js)) and point your server at it. What could a dishonest facilitator do, and what could it not do? |
+| 12 | Expert | Run your own facilitator (see [`.instructor/facilitator.js`](.instructor/facilitator.js)) and point your server at it. What could a dishonest facilitator do, and what could it not do? |
 | 13 | Expert | A reseller: your API buys from a classmate's API, adds something, and resells it at a markup. You are now a business in a machine-to-machine economy. |
 | 14 | Expert | Audit yourself: write a script that reads `Transfer` events from the chain and checks that every fortune your server served was really paid for. |
 
@@ -342,7 +342,7 @@ BUDGET=0.01 node --env-file=.env completed/agent.js
 
 ### Run the instructor tools
 
-See [`instructor/README.md`](instructor/README.md) for funding, the class board, the facilitator and
+See [`.instructor/README.md`](.instructor/README.md) for funding, the class board, the facilitator and
 the load test.
 
 ## Troubleshooting
@@ -354,6 +354,7 @@ the load test.
 | `EADDRINUSE: address already in use` | Your server is already running in another terminal. Stop it with <kbd>Ctrl</kbd> + <kbd>C</kbd>, or use another `PORT`. |
 | The board says **port is private** | Open the **Ports** tab, right-click port 4021, then **Port Visibility** > **Public**. |
 | The board says **unreachable** | Your server is not running, or your Codespace stopped. Restart it with `npm run server`. |
+| `500 Internal Server Error` on a paid route | Your server could not reach the facilitator. Check `FACILITATOR_URL` in `.env`, or delete the line to use the public one. |
 | 402 again after paying, `insufficient_funds` | You are out of USDC. Run `npm run balance` and ask the instructor for a top-up. |
 | 402 again after paying, `invalid_exact_evm_transaction_failed` | Settlement failed on the facilitator side. Nothing was charged. Try again in a few seconds. |
 | Client error `rejected by spendControls.maxAmountPerPayment` | By default the client refuses to pay more than $1 per request. That's a safety feature. |

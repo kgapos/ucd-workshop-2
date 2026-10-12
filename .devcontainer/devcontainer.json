@@ -33,6 +33,13 @@
       "openFiles": [
         "README.md"
       ]
+    },
+    "vscode": {
+      "settings": {
+        "files.exclude": {
+          ".instructor": true
+        }
+      }
     }
   }
 }

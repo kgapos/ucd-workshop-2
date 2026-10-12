@@ -8,7 +8,7 @@ import { publicClient, USDC, EXPLORER, publicUrl } from "../config.js";
 
 const PORT = Number(process.env.BOARD_PORT || 8080);
 const CLASS_FACILITATOR = process.env.CLASS_FACILITATOR_URL; // handed to students when they register
-const FILE = new URL("students.json", import.meta.url);
+const FILE = process.env.STUDENTS_FILE || new URL("students.json", import.meta.url);
 const funder = process.env.FUNDER_PRIVATE_KEY && privateKeyToAccount(process.env.FUNDER_PRIVATE_KEY).address;
 const transfer = parseAbiItem("event Transfer(address indexed from, address indexed to, uint256 value)");
 

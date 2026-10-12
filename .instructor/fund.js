@@ -1,17 +1,17 @@
 // Tops up every student wallet with testnet USDC (and a little ETH) from the instructor's wallet.
-// Safe to re-run: every successful transfer is recorded in instructor/funded.json and not repeated.
+// Safe to re-run: every successful transfer is recorded in .instructor/funded.json and not repeated.
 // (Balances alone are not enough: a load-balanced RPC can return a stale balance right after a transfer.)
 //
 // Usage: npm run fund -- <source> [--dry-run] [--topup]
 //   --topup ignores funded.json and tops every wallet back up to the target, e.g. for a second session.
 //   <source> is any file or URL containing addresses, e.g. the board (https://...-8080.app.github.dev/apis.json),
-//   instructor/students.json, or a CSV exported from a form. Every 0x... address found in it is funded.
-// Env (instructor/.env): FUNDER_PRIVATE_KEY, USDC_AMOUNT (default 1), ETH_AMOUNT (default 0.0005), BATCH (default 10)
+//   .instructor/students.json, or a CSV exported from a form. Every 0x... address found in it is funded.
+// Env (.instructor/.env): FUNDER_PRIVATE_KEY, USDC_AMOUNT (default 1), ETH_AMOUNT (default 0.0005), BATCH (default 10)
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { createWalletClient, http, erc20Abi, getAddress, parseUnits, parseEther, formatUnits, formatEther } from "viem";
+import { createWalletClient, erc20Abi, getAddress, parseUnits, parseEther, formatUnits, formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { baseSepolia } from "viem/chains";
-import { publicClient, USDC, EXPLORER } from "../config.js";
+import { publicClient, transport, USDC, EXPLORER } from "../config.js";
 
 const [source] = process.argv.slice(2).filter((a) => !a.startsWith("--"));
 const dryRun = process.argv.includes("--dry-run");
@@ -23,7 +23,7 @@ if (!source) {
   process.exit(1);
 }
 if (!process.env.FUNDER_PRIVATE_KEY) {
-  console.error("Set FUNDER_PRIVATE_KEY in instructor/.env");
+  console.error("Set FUNDER_PRIVATE_KEY in .instructor/.env");
   process.exit(1);
 }
 const usdcTarget = parseUnits(process.env.USDC_AMOUNT || "1", 6);
@@ -31,7 +31,7 @@ const ethTarget = parseEther(process.env.ETH_AMOUNT || "0.0005");
 const batchSize = Number(process.env.BATCH || 10);
 
 const funder = privateKeyToAccount(process.env.FUNDER_PRIVATE_KEY);
-const wallet = createWalletClient({ account: funder, chain: baseSepolia, transport: http(process.env.RPC_URL) });
+const wallet = createWalletClient({ account: funder, chain: baseSepolia, transport });
 
 const text = /^https?:/.test(source) ? await (await fetch(source)).text() : readFileSync(source, "utf8");
 const addresses = [...new Set(text.match(/0x[0-9a-fA-F]{40}\b/g)?.map((a) => getAddress(a)) || [])].filter((a) => a !== funder.address);
