@@ -16,6 +16,7 @@ const students = existsSync(FILE) ? JSON.parse(readFileSync(FILE, "utf8")) : {};
 const status = {}; // address -> { up, note, received, count, spent, paidOut }
 
 const app = express();
+app.set("trust proxy", true); // behind a reverse proxy, req.protocol comes from X-Forwarded-Proto
 app.use(express.json());
 
 app.post("/register", (req, res) => {
@@ -46,7 +47,7 @@ app.get("/", (req, res) => {
   .up { color: #1a7f37; } .down { color: #cf222e; } code { font-size: .85em; } .num { text-align: right; font-variant-numeric: tabular-nums; }
 </style>
 <h1>x402 class board</h1>
-<p>${rows.length} registered, ${rows.filter((r) => r.up).length} APIs up. Register with <code>npm run register -- ${esc(publicUrl(PORT))}</code></p>
+<p>${rows.length} registered, ${rows.filter((r) => r.up).length} APIs up. Register with <code>npm run register -- ${esc(`${req.protocol}://${req.get("host")}`)}</code></p>
 <table><tr><th>#</th><th>Name</th><th>API</th><th class="num">Paid requests received</th><th class="num">USDC earned</th><th class="num">Payments made</th><th>Wallet</th></tr>
 ${rows.map((r, i) => `<tr><td>${i + 1}</td><td>${esc(r.name)}</td>
 <td class="${r.up ? "up" : "down"}">${r.up ? "● up" : "○ " + esc(r.note || "down")} <a href="${esc(r.url)}">${esc(r.url.replace(/^https?:\/\//, "").slice(0, 32))}</a></td>
