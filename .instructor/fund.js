@@ -4,7 +4,7 @@
 //
 // Usage: npm run fund -- <source> [--dry-run] [--topup]
 //   --topup ignores funded.json and tops every wallet back up to the target, e.g. for a second session.
-//   <source> is any file or URL containing addresses, e.g. the board (https://...-8080.app.github.dev/apis.json),
+//   <source> is any file or URL containing addresses, e.g. the board (https://...-8081.app.github.dev/apis.json),
 //   .instructor/students.json, or a CSV exported from a form. Every 0x... address found in it is funded.
 // Env (.instructor/.env): FUNDER_PRIVATE_KEY, USDC_AMOUNT (default 1), ETH_AMOUNT (default 0.0005), BATCH (default 10)
 import { existsSync, readFileSync, writeFileSync } from "node:fs";

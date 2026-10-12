@@ -1,12 +1,12 @@
 // Live class board: who has registered, whose API is up, and how many paid requests each one received.
-// Usage: npm run board   (then make port 8080 public and share the URL)
+// Usage: npm run board   (then make port 8081 public and share the URL)
 import express from "express";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { isAddress, getAddress, parseAbiItem, formatUnits } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { publicClient, USDC, EXPLORER, publicUrl } from "../config.js";
 
-const PORT = Number(process.env.BOARD_PORT || 8080);
+const PORT = Number(process.env.BOARD_PORT || 8081);
 const CLASS_FACILITATOR = process.env.CLASS_FACILITATOR_URL; // handed to students when they register
 const FILE = process.env.STUDENTS_FILE || new URL("students.json", import.meta.url);
 const funder = process.env.FUNDER_PRIVATE_KEY && privateKeyToAccount(process.env.FUNDER_PRIVATE_KEY).address;

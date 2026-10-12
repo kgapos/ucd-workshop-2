@@ -8,11 +8,11 @@
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
   "updateContentCommand": "npm ci",
-  "postStartCommand": "gh codespace ports visibility 4021:public 4022:public 8080:public -c \"$CODESPACE_NAME\" || true",
+  "postStartCommand": "gh codespace ports visibility 4021:public 4022:public 8081:public -c \"$CODESPACE_NAME\" || true",
   "forwardPorts": [
     4021,
     4022,
-    8080
+    8081
   ],
   "portsAttributes": {
     "4021": {
@@ -23,7 +23,7 @@
       "label": "Facilitator (instructor only)",
       "onAutoForward": "silent"
     },
-    "8080": {
+    "8081": {
       "label": "Class board (instructor only)",
       "onAutoForward": "silent"
     }

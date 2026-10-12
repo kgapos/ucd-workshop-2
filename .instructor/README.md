@@ -76,7 +76,7 @@ docker compose ps        # both services should become "healthy"
 docker compose logs -f   # settlements are logged as "settled #N <tx hash>"
 ```
 
-This publishes the facilitator on port 4022 and the board on port 8080. Put both behind HTTPS with
+This publishes the facilitator on port 4022 and the board on port 8081. Put both behind HTTPS with
 your reverse proxy or tunnel of choice, then set `CLASS_FACILITATOR_URL` to the facilitator's public
 URL and restart the board with `docker compose up -d`. Registrations are stored in the `board-data`
 volume and survive restarts.
@@ -94,13 +94,13 @@ In your Codespace, start the facilitator and the board in two terminals:
 
 ```bash
 npm run facilitator     # port 4022
-npm run board           # port 8080
+npm run board           # port 8081
 ```
 
 Make both ports public, so students' servers and browsers can reach them:
 
 ```bash
-gh codespace ports visibility 4022:public 8080:public -c "$CODESPACE_NAME"
+gh codespace ports visibility 4022:public 8081:public -c "$CODESPACE_NAME"
 ```
 
 Put the facilitator's public URL in `CLASS_FACILITATOR_URL` (in `.instructor/.env`) before students
@@ -112,8 +112,8 @@ Then, during Part 0:
 2. Preview the funding, then send it:
 
    ```bash
-   npm run fund -- https://<your-codespace>-8080.app.github.dev/apis.json --dry-run
-   npm run fund -- https://<your-codespace>-8080.app.github.dev/apis.json
+   npm run fund -- https://<your-codespace>-8081.app.github.dev/apis.json --dry-run
+   npm run fund -- https://<your-codespace>-8081.app.github.dev/apis.json
    ```
 
    Re-run the second command whenever more students have registered. Every successful transfer is
@@ -142,7 +142,7 @@ Students then run `git pull` and get `completed/` without conflicts, even if the
 | Command | What it does |
 |---|---|
 | `npm run fund -- <source> [--dry-run] [--topup]` | Sends USDC (`USDC_AMOUNT`) and ETH (`ETH_AMOUNT`) to every address found in `<source>`. `<source>` can be the board's `/apis.json`, `.instructor/students.json`, or any CSV or text file: every `0x...` address in it is used. Sends in batches of `BATCH` with consecutive nonces, waits for receipts, retries failed broadcasts, and stops rather than leave a nonce gap. `--topup` ignores the ledger and tops everyone back up to the target. |
-| `npm run board` | The class board on port 8080. `POST /register` adds a student, `GET /apis.json` lists everyone with their status, `GET /` is the live page. It checks every API every 15 seconds and counts USDC transfers on-chain every 10 seconds. Your funding transfers are not counted. Registrations persist in `.instructor/students.json`. Set `FROM_BLOCK` to choose where counting starts (default: about 2 hours back). |
+| `npm run board` | The class board on port 8081. `POST /register` adds a student, `GET /apis.json` lists everyone with their status, `GET /` is the live page. It checks every API every 15 seconds and counts USDC transfers on-chain every 10 seconds. Your funding transfers are not counted. Registrations persist in `.instructor/students.json`. Set `FROM_BLOCK` to choose where counting starts (default: about 2 hours back). |
 | `npm run facilitator` | A self-hosted x402 facilitator for Base Sepolia on port 4022 (`/verify`, `/settle`, `/supported`). It pays gas from `FACILITATOR_PRIVATE_KEY`. |
 | `npm run loadtest -- <paid-url> [--requests N] [--concurrency C]` | Sends N real paid requests, C at a time, and reports latency percentiles and a breakdown of outcomes and errors. It pays from `PRIVATE_KEY` in `.env`, or `LOADTEST_PRIVATE_KEY`. Each successful request costs its price in testnet USDC. |
 

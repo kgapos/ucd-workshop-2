@@ -21,7 +21,7 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
       Use a secure channel, and never commit it.
 - [ ] `cd .instructor/infrastructure && docker compose up -d --build`, then check that both services are healthy.
 - [ ] Expose both services over HTTPS through the reverse proxy or tunnel, for example
-      `facilitator.<domain>` -> port 4022 and `board.<domain>` -> port 8080.
+      `facilitator.<domain>` -> port 4022 and `board.<domain>` -> port 8081.
 - [ ] Set `CLASS_FACILITATOR_URL=https://facilitator.<domain>` in `.instructor/.env` and run `docker compose up -d`.
 - [ ] Verify from outside: `curl https://facilitator.<domain>/supported` and open `https://board.<domain>`.
 - [ ] Decide on `RPC_URL`: keep the public endpoints, or add an RPC provider key or your own node first in the list.
