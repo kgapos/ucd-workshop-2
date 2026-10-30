@@ -369,7 +369,7 @@ the load test.
 | `Cannot find module` or `ERR_MODULE_NOT_FOUND`                 | The dependencies did not finish installing. Run `npm ci`.                                                                 |
 | `EADDRINUSE: address already in use`                           | Your server is already running in another terminal. Stop it with <kbd>Ctrl</kbd> + <kbd>C</kbd>, or use another `PORT`.   |
 | The board says **port is private**                             | Open the **Ports** tab, right-click port 4021, then **Port Visibility** > **Public**.                                     |
-| The board says **port not forwarded**                          | Open the **Ports** tab, right-click port 4021, then **Port Visibility** > **Private**, then back to **Public**.           |
+| The board says **port not forwarded**                          | Reopen your Codespace if it stopped. Otherwise, in the **Ports** tab set port 4021 to **Private**, then back to **Public**. |
 | The board says **unreachable**                                 | Your server is not running, or your Codespace stopped. Restart it with `npm run server`.                                  |
 | `500 Internal Server Error` on a paid route                    | Your server could not reach the facilitator. Check `FACILITATOR_URL` in `.env`, or delete the line to use the public one. |
 | 402 again after paying, `insufficient_funds`                   | You are out of USDC. Run `npm run balance` and ask the instructor for a top-up.                                           |

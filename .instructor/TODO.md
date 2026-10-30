@@ -24,7 +24,7 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 - [x] Set `CLASS_FACILITATOR_URL=https://facilitator.kgapos.com` in `.instructor/.env` and run `docker compose up -d`.
 - [x] Verify from outside: `curl https://facilitator.kgapos.com/supported` and open `https://ucd.kgapos.com`.
       Checked on 2026-10-12: a payment settled through the facilitator, and a load test passed 40/40 at concurrency 20.
-- [ ] Remove the `RPC_URL` line from the homelab `.instructor/.env`, so that the four public RPCs in `config.js`
+- [x] Remove the `RPC_URL` line from the homelab `.instructor/.env`, so that the four public RPCs in `config.js`
       apply, then `git pull` and `docker compose up -d --build`.
 
 ### Rehearsal (the day before)
