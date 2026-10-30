@@ -49,11 +49,12 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 
 ### Slides
 
-- [ ] Create the intro presentation (about 10 minutes, during Part 0 while the Codespaces build):
+- [x] Create the intro presentation (about 10 minutes, during Part 0 while the Codespaces build):
       HTTP 402, the x402 flow, the facilitator's role, why stablecoins suit machine payments,
       why Base Sepolia, and the workshop plan.
-- [ ] Add a slide with the board URL, and one with the commands for Part 1.
-- [ ] Add a closing slide with the challenges and the resources.
+      Done on 2026-10-30: https://claude.ai/artifact/5cDz6E2xx3Jo3veHCdHnCn (private, 15 slides with speaker notes).
+- [x] Add a slide with the board URL, and one with the commands for Part 1.
+- [x] Add a closing slide with the challenges and the resources.
 
 ### On the day
 
