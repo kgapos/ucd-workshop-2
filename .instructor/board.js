@@ -155,7 +155,9 @@ async function checkApis() {
     try {
       const r = await fetch(s.url + "/", { redirect: "manual", signal: AbortSignal.timeout(4000) });
       st.up = r.ok;
-      st.note = r.ok ? "" : [301, 302, 401].includes(r.status) ? "port is private" : `HTTP ${r.status}`;
+      // An empty 404 from GitHub's tunnel (not from Express) means the port forwarding went stale.
+      const stale = r.status === 404 && r.headers.get("x-served-by")?.startsWith("tunnels");
+      st.note = r.ok ? "" : [301, 302, 401].includes(r.status) ? "port is private" : stale ? "port not forwarded" : `HTTP ${r.status}`;
     } catch {
       st.up = false;
       st.note = "unreachable";

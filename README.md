@@ -40,6 +40,11 @@ All you need is a browser and a GitHub account. No browser wallet, no API keys, 
 - [Part 5: Stretch goals](#part-5-stretch-goals)
 - [Challenges](#challenges)
 - [How to](#how-to)
+  - [Use AI tools](#use-ai-tools)
+  - [Check the balance of any address](#check-the-balance-of-any-address)
+  - [Run your API on a different port](#run-your-api-on-a-different-port)
+  - [Run the reference solution](#run-the-reference-solution)
+  - [Run the instructor tools](#run-the-instructor-tools)
 - [Troubleshooting](#troubleshooting)
 - [Resources](#resources)
 - [License](#license)
@@ -170,8 +175,8 @@ The instructor will then send testnet USDC to every registered address. Wait a m
 npm run balance
 ```
 
-If you see a USDC balance, you are ready to go! Open the explorer link it prints and look at the
-transfer you received.
+If you see a 1 USDC and 0.0005 ETH balance, you are ready to go! Open the explorer link it prints 
+and look at the transfer you received.
 
 ## Part 2: A paid API
 
@@ -297,22 +302,22 @@ The [challenges](#challenges) below go further.
 
 Ordered from very simple to hard. Do them in any order you like.
 
-| # | Level | Challenge |
-|---|---|---|
-| 1 | Easy | Change the price of `/fortune` and confirm the new `amount` in the 402 header. |
-| 2 | Easy | Find one of your payments on the explorer. Identify the payer, the payee and who paid the gas. |
-| 3 | Easy | Pay three different classmates. Check that your USDC balance went down by the right amount. |
-| 4 | Easy | Add a free `/stats` endpoint that returns how many fortunes your API has sold. |
-| 5 | Medium | Add a second paid route with a different price, and list both in `GET /`. |
-| 6 | Medium | Make the client print your USDC balance before and after each payment. |
-| 7 | Medium | Add a per-run budget to the client: refuse to sign once it has spent `BUDGET` USDC. |
-| 8 | Medium | Dynamic pricing: `/bulk?count=N` returns N fortunes at $0.001 each. |
-| 9 | Hard | Surge pricing: make the price depend on how busy your API is. Hint: the price is computed again when the paid retry arrives, and it must match what the client signed. How do you keep it stable? |
-| 10 | Hard | Write an agent that buys the cheapest offer from every API on the board, without paying anyone twice, until its budget runs out. |
-| 11 | Hard | Accept **EURC** as well as USDC on the same route (`accepts` can be an array). The client has to allow the extra asset too. |
-| 12 | Expert | Run your own facilitator (see [`.instructor/facilitator.js`](.instructor/facilitator.js)) and point your server at it. What could a dishonest facilitator do, and what could it not do? |
-| 13 | Expert | A reseller: your API buys from a classmate's API, adds something, and resells it at a markup. You are now a business in a machine-to-machine economy. |
-| 14 | Expert | Audit yourself: write a script that reads `Transfer` events from the chain and checks that every fortune your server served was really paid for. |
+| #   | Level  | Challenge                                                                                                                                                                                         |
+| --- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Easy   | Change the price of `/fortune` and confirm the new `amount` in the 402 header.                                                                                                                    |
+| 2   | Easy   | Find one of your payments on the explorer. Identify the payer, the payee and who paid the gas.                                                                                                    |
+| 3   | Easy   | Pay three different classmates. Check that your USDC balance went down by the right amount.                                                                                                       |
+| 4   | Easy   | Add a free `/stats` endpoint that returns how many fortunes your API has sold.                                                                                                                    |
+| 5   | Medium | Add a second paid route with a different price, and list both in `GET /`.                                                                                                                         |
+| 6   | Medium | Make the client print your USDC balance before and after each payment.                                                                                                                            |
+| 7   | Medium | Add a per-run budget to the client: refuse to sign once it has spent `BUDGET` USDC.                                                                                                               |
+| 8   | Medium | Dynamic pricing: `/bulk?count=N` returns N fortunes at $0.001 each.                                                                                                                               |
+| 9   | Hard   | Surge pricing: make the price depend on how busy your API is. Hint: the price is computed again when the paid retry arrives, and it must match what the client signed. How do you keep it stable? |
+| 10  | Hard   | Write an agent that buys the cheapest offer from every API on the board, without paying anyone twice, until its budget runs out.                                                                  |
+| 11  | Hard   | Accept **EURC** as well as USDC on the same route (`accepts` can be an array). The client has to allow the extra asset too.                                                                       |
+| 12  | Expert | Run your own facilitator (see [`.instructor/facilitator.js`](.instructor/facilitator.js)) and point your server at it. What could a dishonest facilitator do, and what could it not do?           |
+| 13  | Expert | A reseller: your API buys from a classmate's API, adds something, and resells it at a markup. You are now a business in a machine-to-machine economy.                                             |
+| 14  | Expert | Audit yourself: write a script that reads `Transfer` events from the chain and checks that every fortune your server served was really paid for.                                                  |
 
 ## How to
 
@@ -358,19 +363,20 @@ the load test.
 
 ## Troubleshooting
 
-| Problem | Fix |
-|---|---|
-| `No PRIVATE_KEY in .env` | Run `npm run wallet`. Make sure you are in the repository folder. |
-| `Cannot find module` or `ERR_MODULE_NOT_FOUND` | The dependencies did not finish installing. Run `npm ci`. |
-| `EADDRINUSE: address already in use` | Your server is already running in another terminal. Stop it with <kbd>Ctrl</kbd> + <kbd>C</kbd>, or use another `PORT`. |
-| The board says **port is private** | Open the **Ports** tab, right-click port 4021, then **Port Visibility** > **Public**. |
-| The board says **unreachable** | Your server is not running, or your Codespace stopped. Restart it with `npm run server`. |
-| `500 Internal Server Error` on a paid route | Your server could not reach the facilitator. Check `FACILITATOR_URL` in `.env`, or delete the line to use the public one. |
-| 402 again after paying, `insufficient_funds` | You are out of USDC. Run `npm run balance` and ask the instructor for a top-up. |
-| 402 again after paying, `invalid_exact_evm_transaction_failed` | Settlement failed on the facilitator side. Nothing was charged. Try again in a few seconds. |
-| Client error `rejected by spendControls.maxAmountPerPayment` | By default the client refuses to pay more than $1 per request. That's a safety feature. |
-| Client says `budget ... reached` | Your own spending cap worked. Raise `BUDGET` or start a new run. |
-| Your Codespace stopped while you were away | Codespaces stop after 30 idle minutes. Reopen it from GitHub and run `npm run server` again. The URL stays the same. |
+| Problem                                                        | Fix                                                                                                                       |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `No PRIVATE_KEY in .env`                                       | Run `npm run wallet`. Make sure you are in the repository folder.                                                         |
+| `Cannot find module` or `ERR_MODULE_NOT_FOUND`                 | The dependencies did not finish installing. Run `npm ci`.                                                                 |
+| `EADDRINUSE: address already in use`                           | Your server is already running in another terminal. Stop it with <kbd>Ctrl</kbd> + <kbd>C</kbd>, or use another `PORT`.   |
+| The board says **port is private**                             | Open the **Ports** tab, right-click port 4021, then **Port Visibility** > **Public**.                                     |
+| The board says **port not forwarded**                          | Open the **Ports** tab, right-click port 4021, then **Port Visibility** > **Private**, then back to **Public**.           |
+| The board says **unreachable**                                 | Your server is not running, or your Codespace stopped. Restart it with `npm run server`.                                  |
+| `500 Internal Server Error` on a paid route                    | Your server could not reach the facilitator. Check `FACILITATOR_URL` in `.env`, or delete the line to use the public one. |
+| 402 again after paying, `insufficient_funds`                   | You are out of USDC. Run `npm run balance` and ask the instructor for a top-up.                                           |
+| 402 again after paying, `invalid_exact_evm_transaction_failed` | Settlement failed on the facilitator side. Nothing was charged. Try again in a few seconds.                               |
+| Client error `rejected by spendControls.maxAmountPerPayment`   | By default the client refuses to pay more than $1 per request. That's a safety feature.                                   |
+| Client says `budget ... reached`                               | Your own spending cap worked. Raise `BUDGET` or start a new run.                                                          |
+| Your Codespace stopped while you were away                     | Codespaces stop after 30 idle minutes. Reopen it from GitHub and run `npm run server` again. The URL stays the same.      |
 
 ## Resources
 
