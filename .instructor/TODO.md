@@ -36,7 +36,7 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 - [x] Load test at class size against an API that uses the homelab facilitator:
       `npm run loadtest -- <api-url>/fortune --requests 100 --concurrency 40`.
       Done on 2026-10-30: 100/100 succeeded in 4.8s (p95 2.2s), using 0.00005 ETH of facilitator gas.
-- [ ] Clear test registrations: stop the board, delete `students.json` from the `board-data` volume, then start it again.
+- [x] Clear test registrations: stop the board, delete `students.json` from the `board-data` volume, then start it again.
       Also remove the test entries from `.instructor/funded.json` on the machine you fund from.
 - [ ] Delete test Codespaces (`gh codespace list`, `gh codespace delete`).
 
