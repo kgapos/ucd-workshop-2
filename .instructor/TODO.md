@@ -48,16 +48,17 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 
 ### Slides
 
-- [ ] Create the Part 0 presentation (about 10 minutes): HTTP 402, the x402 flow, the facilitator's role,
-      why stablecoins suit machine payments, why Base Sepolia, and the workshop plan.
-- [ ] Add a slide with the board URL, and one with the commands for Part 0.
+- [ ] Create the intro presentation (about 10 minutes, during Part 0 while the Codespaces build):
+      HTTP 402, the x402 flow, the facilitator's role, why stablecoins suit machine payments,
+      why Base Sepolia, and the workshop plan.
+- [ ] Add a slide with the board URL, and one with the commands for Part 1.
 - [ ] Add a closing slide with the challenges and the resources.
 
 ### On the day
 
 - [ ] Before students arrive: check that `docker compose ps` is healthy, open the board on the projector,
       and confirm the funder balances.
-- [ ] Part 0: share the board URL. Once most students have registered, run
+- [ ] Part 1: share the board URL. Once most students have registered, run
       `npm run fund -- https://ucd.kgapos.com/apis.json --dry-run`, then run it for real.
       Re-run it for late arrivals.
 - [ ] About an hour in: release the reference solution (`git merge solution && git push origin main`) and

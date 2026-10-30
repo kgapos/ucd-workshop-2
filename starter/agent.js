@@ -1,4 +1,4 @@
-// Part 4 (stretch): an agent that decides which classmate APIs to pay for, using plain rules.
+// Part 5 (stretch): an agent that decides which classmate APIs to pay for, using plain rules.
 // Usage: npm run agent  (needs BOARD_URL in .env)
 import { wrapFetchWithPayment, x402Client } from "@x402/fetch";
 import { ExactEvmScheme } from "@x402/evm/exact/client";
@@ -19,9 +19,9 @@ const apis = await (await fetch(`${board}/apis.json`)).json();
 console.log(`${apis.filter((a) => a.up).length} of ${apis.length} APIs are up`);
 
 // Every API answers GET / for free with { name, payTo, endpoints: [{ route, price, description }] }.
-// TODO 4.1: collect all offers (url + price) from the APIs that are up. Skip your own.
+// TODO 5.1: collect all offers (url + price) from the APIs that are up. Skip your own.
 
-// TODO 4.2: decide what to buy. Some ideas for rules:
+// TODO 5.2: decide what to buy. Some ideas for rules:
 //   cheapest first, one purchase per seller, never pay more than $0.005, prefer APIs with fewer paid requests...
 
-// TODO 4.3: buy with fetchWithPayment() until the budget runs out, and print what you got.
+// TODO 5.3: buy with fetchWithPayment() until the budget runs out, and print what you got.

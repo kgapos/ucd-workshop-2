@@ -9,7 +9,7 @@ import { account, NETWORK, FACILITATOR_URL, PORT, publicUrl } from "../config.js
 const name = process.env.NAME || process.env.GITHUB_USER || "anonymous";
 const payTo = account().address; // payments go to your own wallet
 
-// TODO 3.1: make these yours. Jokes, haiku, ASCII art, a random number, a weather report for Dublin...
+// TODO 4.1: make these yours. Jokes, haiku, ASCII art, a random number, a weather report for Dublin...
 const fortunes = [
   "A smart contract is only as smart as its author.",
   "You will find a bug in production. It will be yours.",
@@ -17,7 +17,7 @@ const fortunes = [
 ];
 const pick = () => fortunes[Math.floor(Math.random() * fortunes.length)];
 
-// TODO 1.1: describe which routes cost money. Each key is "METHOD /path", and each value says
+// TODO 2.1: describe which routes cost money. Each key is "METHOD /path", and each value says
 // how this route can be paid for:
 //   accepts: { scheme: "exact", price: "$0.001", network: NETWORK, payTo }
 // plus an optional description and mimeType (shown to the client in the 402 response).
@@ -26,7 +26,7 @@ const paidRoutes = {};
 const app = express();
 app.set("trust proxy", true); // Codespaces sits behind a proxy
 
-// TODO 1.2: protect the routes above.
+// TODO 2.2: protect the routes above.
 //  a) Create an HTTPFacilitatorClient that talks to FACILITATOR_URL.
 //  b) Create an x402ResourceServer that uses it, and register the ExactEvmScheme for NETWORK.
 //  c) app.use(paymentMiddleware(paidRoutes, yourResourceServer));

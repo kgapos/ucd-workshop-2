@@ -32,12 +32,12 @@ All you need is a browser and a GitHub account. No browser wallet, no API keys, 
   - [Why Base Sepolia](#why-base-sepolia)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
-  - [Open the Codespace](#open-the-codespace)
-- [Part 0: Your wallet](#part-0-your-wallet)
-- [Part 1: A paid API](#part-1-a-paid-api)
-- [Part 2: A client that pays](#part-2-a-client-that-pays)
-- [Part 3: Pay your classmates](#part-3-pay-your-classmates)
-- [Part 4: Stretch goals](#part-4-stretch-goals)
+- [Part 0: Open the Codespace](#part-0-open-the-codespace)
+- [Part 1: Your wallet](#part-1-your-wallet)
+- [Part 2: A paid API](#part-2-a-paid-api)
+- [Part 3: A client that pays](#part-3-a-client-that-pays)
+- [Part 4: Pay your classmates](#part-4-pay-your-classmates)
+- [Part 5: Stretch goals](#part-5-stretch-goals)
 - [Challenges](#challenges)
 - [How to](#how-to)
 - [Troubleshooting](#troubleshooting)
@@ -130,20 +130,22 @@ far more than this workshop needs.
 
 > :information_source: Prefer your own machine? You need [Node.js](https://nodejs.org) 22 or newer.
 > Clone this repository, run `npm ci`, and follow the same steps. Your API will only be reachable
-> on `localhost`, so for Part 3 you will need a tunnel of your choice, or a Codespace.
+> on `localhost`, so for Part 4 you will need a tunnel of your choice, or a Codespace.
 
-### Open the Codespace
+## Part 0: Open the Codespace
 
 1. Click this button, then **Create codespace**:
 
    [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/kgapos/ucd-workshop-2)
 
-2. Wait a minute or two. When the editor appears, the dependencies are installed.
-3. Open a terminal: **Terminal** > **New Terminal** (or <kbd>Ctrl</kbd> + <kbd>`</kbd>).
+2. Wait for the editor to open and show the repository's files. The first time takes a minute or two.
+3. When the editor asks whether you trust the authors of the files in this workspace, approve it
+   (**Yes, I trust the authors**). The Codespace then finishes setting up and installs the dependencies.
+4. Open a terminal: **Terminal** > **New Terminal** (or <kbd>Ctrl</kbd> + <kbd>`</kbd>).
 
 Every command below runs in that terminal.
 
-## Part 0: Your wallet
+## Part 1: Your wallet
 
 Create a wallet. This generates a private key, saves it to `.env` and prints your address:
 
@@ -170,7 +172,7 @@ npm run balance
 If you see a USDC balance, you are ready to go! Open the explorer link it prints and look at the
 transfer you received.
 
-## Part 1: A paid API
+## Part 2: A paid API
 
 Start the API:
 
@@ -189,10 +191,10 @@ curl -i localhost:4021/fortune
 Both are free for now. Open [`starter/server.js`](starter/server.js): your job is to put a price on
 `/fortune`.
 
-**TODO 1.1**: describe the paid route in `paidRoutes`. Each key is `"METHOD /path"`, and each value
+**TODO 2.1**: describe the paid route in `paidRoutes`. Each key is `"METHOD /path"`, and each value
 says which payment scheme, price, network and recipient the route accepts.
 
-**TODO 1.2**: create the facilitator client and the resource server, and add the payment middleware.
+**TODO 2.2**: create the facilitator client and the resource server, and add the payment middleware.
 
 <details>
 <summary>Hint</summary>
@@ -223,7 +225,7 @@ contract, and `payTo` is your own address.
 > :information_source: `curl localhost:4021/` (the free index) lists your paid endpoints and their
 > prices. Classmates and agents use it to discover what you sell.
 
-## Part 2: A client that pays
+## Part 3: A client that pays
 
 Run the client against your own API:
 
@@ -234,11 +236,11 @@ npm run client
 As it is, the client uses plain `fetch`, so it just prints the `402` and the decoded payment
 requirements. Open [`starter/client.js`](starter/client.js) and make it pay.
 
-**TODO 2.1**: create an `x402Client` and register an `ExactEvmScheme` that signs with `account()`.
+**TODO 3.1**: create an `x402Client` and register an `ExactEvmScheme` that signs with `account()`.
 
-**TODO 2.2**: wrap `fetch` with `wrapFetchWithPayment` and use the wrapped version.
+**TODO 3.2**: wrap `fetch` with `wrapFetchWithPayment` and use the wrapped version.
 
-**TODO 2.3**: decode the `PAYMENT-RESPONSE` header and print a block explorer link to the transaction.
+**TODO 3.3**: decode the `PAYMENT-RESPONSE` header and print a block explorer link to the transaction.
 
 <details>
 <summary>Hint</summary>
@@ -253,11 +255,11 @@ closely:
 
 - **Who sent the transaction** (`From`)? It is not you. It's the facilitator, which paid the gas.
 - **Who moved the tokens** (the ERC-20 transfer)? From your address to the `payTo` address.
-- You paid yourself, so your balance did not change. In Part 3 it will.
+- You paid yourself, so your balance did not change. In Part 4 it will.
 
 Run `npm run balance` before and after a payment to a classmate to see the difference.
 
-## Part 3: Pay your classmates
+## Part 4: Pay your classmates
 
 Open the class board in your browser (the URL you registered with). It shows every API, whether it
 is up, and how many paid requests each one has received. The same data is available as JSON at
@@ -269,14 +271,14 @@ Pick a classmate whose API is up and buy their fortune:
 npm run client -- https://<their-codespace>-4021.app.github.dev/fortune
 ```
 
-Then make your API worth paying for. **TODO 3.1** in `starter/server.js`: replace the fortunes with
+Then make your API worth paying for. **TODO 4.1** in `starter/server.js`: replace the fortunes with
 something of your own. Jokes, haiku, ASCII art, a random Pokémon, a weather report for Dublin, a
 fake stock tip. Make it unique and watch your counter on the board go up.
 
 > :information_source: Your API must be **public** for classmates to reach it. The Codespace sets
 > this up for you. If the board says "port is private", see [Troubleshooting](#troubleshooting).
 
-## Part 4: Stretch goals
+## Part 5: Stretch goals
 
 Pick whatever interests you. There are no TODOs here, only ideas:
 

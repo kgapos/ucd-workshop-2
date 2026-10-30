@@ -105,7 +105,7 @@ gh codespace ports visibility 4022:public 8081:public -c "$CODESPACE_NAME"
 Put the facilitator's public URL in `CLASS_FACILITATOR_URL` (in `.instructor/.env`) before students
 register. The board hands it to every student, and `npm run register` saves it to their `.env`.
 
-Then, during Part 0:
+Then, during Part 1:
 
 1. Put the board URL on a slide. Students run `npm run register -- <board-url>`.
 2. Preview the funding, then send it:
