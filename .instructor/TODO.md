@@ -4,15 +4,14 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 
 ### Funding
 
-- [ ] Claim USDC for the funder `0x7D318699609Bd72371F6bFa19151763a620d8Bfa` at
+- [x] Claim USDC for the funder `0x7D318699609Bd72371F6bFa19151763a620d8Bfa` at
       [faucet.circle.com](https://faucet.circle.com) (USDC, Base Sepolia, 20 per claim, once every 2 hours).
-      Target: about 50 USDC (40 for students plus room for top-ups and load tests). Had 15.25 on 2026-10-12,
-      so 2 more claims.
-- [ ] Top up the funder with Base Sepolia ETH. Target: 0.03 ETH (40 x 0.0005 for students, plus gas).
-      Had 0.022 on 2026-10-12.
-- [ ] Check the facilitator gas wallet `0x8E235bF4167D759A61355A7cB0b37A1FcbeDCfe8`. Target: 0.01 to 0.02 ETH.
-      Had 0.025 on 2026-10-12, which is enough. Keep it small, since the facilitator URL is public.
-- [ ] Check all balances with `npm run balance -- <address>`.
+      Target: about 50 USDC (40 for students plus room for top-ups and load tests). Had 73.77 on 2026-10-30.
+- [x] Top up the funder with Base Sepolia ETH. Target: 0.03 ETH (40 x 0.0005 for students, plus gas).
+      Had 0.222 on 2026-10-30.
+- [x] Check the facilitator gas wallet `0x8E235bF4167D759A61355A7cB0b37A1FcbeDCfe8`. Target: 0.01 to 0.02 ETH.
+      Had 0.0248 on 2026-10-30, which is enough. Keep it small, since the facilitator URL is public.
+- [x] Check all balances with `npm run balance -- <address>`.
 
 ### Homelab infrastructure
 
@@ -30,9 +29,10 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 
 ### Rehearsal (the day before)
 
-- [ ] Open a fresh Codespace as a student: `npm run wallet`, `npm run register -- https://ucd.kgapos.com`,
+- [x] Open a fresh Codespace as a student: `npm run wallet`, `npm run register -- https://ucd.kgapos.com`,
       then confirm `FACILITATOR_URL` was saved to `.env`.
-- [ ] Fund it with `npm run fund -- https://ucd.kgapos.com/apis.json`, then complete Parts 1 and 2 using the TODO hints.
+- [x] Fund it with `npm run fund -- https://ucd.kgapos.com/apis.json`, then complete the workshop using the TODO hints.
+      Done on 2026-10-30 with kgapos2: worked end to end.
 - [ ] Load test at class size against an API that uses the homelab facilitator:
       `npm run loadtest -- <api-url>/fortune --requests 100 --concurrency 40`.
 - [ ] Clear test registrations: stop the board, delete `students.json` from the `board-data` volume, then start it again.

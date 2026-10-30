@@ -403,3 +403,4 @@ and the following projects:
 - [x402](https://github.com/x402-foundation/x402)
 - [viem](https://github.com/wevm/viem)
 - [Express](https://github.com/expressjs/express)
+- [Claude Code](https://github.com/anthropics/claude-code) by Anthropic
