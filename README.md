@@ -125,8 +125,9 @@ do today can cost you real money.
 - A [GitHub](https://github.com) account
 
 That's it. Everything else runs in a GitHub Codespace, a Linux machine in the cloud with Node.js
-and all the dependencies already installed. Personal GitHub accounts include free Codespaces hours,
-far more than this workshop needs.
+and all the dependencies already installed. A personal GitHub account includes 120 core hours and
+15 GB of storage for Codespaces every month for free. On the standard 2-core machine this workshop
+uses, that is about 60 hours of coding time, far more than the workshop needs.
 
 > :information_source: Prefer your own machine? You need [Node.js](https://nodejs.org) 22 or newer.
 > Clone this repository, run `npm ci`, and follow the same steps. Your API will only be reachable
