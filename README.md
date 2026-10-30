@@ -134,8 +134,14 @@ far more than this workshop needs.
 
 ### Open the Codespace
 
-1. Open this repository on GitHub.
-2. Click **Code** > **Codespaces** > **Create codespace on main**.
+1. Click this button, then **Create codespace**:
+
+   [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/kgapos/ucd-workshop-2)
+
+2. Or, on the repository page, click **Code** > **Codespaces** > **Create codespace on main**:
+
+   <img src=".github/codespaces.png" alt="The Code menu, Codespaces tab, with the Create codespace on main button" width="320">
+
 3. Wait a minute or two. When the editor appears, the dependencies are installed.
 4. Open a terminal: **Terminal** > **New Terminal** (or <kbd>Ctrl</kbd> + <kbd>`</kbd>).
 
