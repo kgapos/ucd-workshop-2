@@ -3,3 +3,4 @@ node_modules/
 *.env
 .instructor/students.json
 .instructor/funded.json
+sales.jsonl

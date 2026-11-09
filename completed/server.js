@@ -1,5 +1,6 @@
 // Reference solution: an Express API with free and paid (x402) endpoints.
 import express from "express";
+import { appendFileSync } from "node:fs";
 import { paymentMiddleware, x402ResourceServer } from "@x402/express";
 import { HTTPFacilitatorClient } from "@x402/core/server";
 import { ExactEvmScheme } from "@x402/evm/exact/server";
@@ -31,6 +32,17 @@ app.set("trust proxy", true); // Codespaces sits behind a proxy
 
 const facilitator = new HTTPFacilitatorClient({ url: FACILITATOR_URL });
 const resourceServer = new x402ResourceServer(facilitator).register(NETWORK, new ExactEvmScheme());
+
+// Challenge 14: keep a sales ledger, one JSON line per paid response, so `completed/audit.js` can check each
+// sale against the chain. A response is only served when settlement succeeds, so this is every paid fortune.
+const SALES_FILE = process.env.SALES_FILE || "sales.jsonl";
+resourceServer.onAfterSettle(async ({ result, requirements, transportContext }) => {
+  if (!result.success) return;
+  const sale = { time: new Date().toISOString(), route: transportContext?.request?.path, payer: result.payer,
+    payTo: requirements.payTo, asset: requirements.asset, amount: requirements.amount, transaction: result.transaction };
+  appendFileSync(SALES_FILE, JSON.stringify(sale) + "\n");
+});
+
 app.use(paymentMiddleware(paidRoutes, resourceServer));
 
 // Free: describes this API so classmates (and agents) know what is on offer.
