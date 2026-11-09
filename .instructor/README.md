@@ -125,12 +125,12 @@ If the facilitator ever has trouble, students can delete the `FACILITATOR_URL` l
 
 ## Releasing the reference solution
 
-The reference solution lives on the local `solution` branch, which is **not pushed**. It only adds
+The reference solution lives on the `completed` branch, which is pushed but **not merged** into `main`. It only adds
 the `completed/` folder, so it merges cleanly. When you are ready (for example an hour in):
 
 ```bash
 git switch main
-git merge solution
+git merge completed
 git push origin main
 ```
 
