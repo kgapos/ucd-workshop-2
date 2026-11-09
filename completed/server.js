@@ -18,10 +18,16 @@ const fortunes = [
 const pick = () => fortunes[Math.floor(Math.random() * fortunes.length)];
 
 // Part 2: which routes cost money, how much, and who gets paid.
+// Challenge 5: a second paid route at a different price (/premium).
 const paidRoutes = {
   "GET /fortune": {
     accepts: { scheme: "exact", price: "$0.001", network: NETWORK, payTo },
     description: "One fortune cookie",
+    mimeType: "application/json",
+  },
+  "GET /premium": {
+    accepts: { scheme: "exact", price: "$0.01", network: NETWORK, payTo },
+    description: "A hand-picked fortune, ten times the price",
     mimeType: "application/json",
   },
 };
@@ -48,6 +54,7 @@ app.get("/", (req, res) => {
 
 app.get("/hello", (req, res) => res.json({ message: `Hello from ${name}, this one is free.` }));
 app.get("/fortune", (req, res) => res.json({ fortune: pick(), from: name }));
+app.get("/premium", (req, res) => res.json({ fortune: fortunes[3], from: name, premium: true }));
 
 app.listen(PORT, () => {
   console.log(`API for ${name} listening on port ${PORT}`);
