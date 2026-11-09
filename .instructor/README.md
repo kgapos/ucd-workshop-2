@@ -127,7 +127,7 @@ If the facilitator ever has trouble, students can delete the `FACILITATOR_URL` l
 
 The reference solution is split into one branch per part, each on top of the one before:
 `part/2-server` (TODOs 2.1 and 2.2), then `part/3-client` (TODOs 3.1 to 3.3), then `part/4-fortunes` (TODO 4.1).
-They are pushed but **not merged** into `main`, and they only add the `completed/` folder, so they merge cleanly.
+They are pushed but **not merged** into `main`, and they add the `completed/` folder, so they merge cleanly.
 
 When you are ready (for example an hour in), release Parts 2 to 4 in one go:
 
@@ -140,6 +140,28 @@ git push origin main
 To release part by part instead, merge `part/2-server`, `part/3-client` and `part/4-fortunes` in turn as the
 class finishes each part. Students then run `git pull` and get `completed/` without conflicts, even if they
 edited `starter/`.
+
+### Challenge branches
+
+Every challenge with code has its own branch on top of `part/4-fortunes`. The Part 5 TODOs in `starter/agent.js`
+are challenge 10. Challenges 1 to 3 are hands-on, with no code. Most branches change `completed/server.js`, so
+merging two of them usually conflicts. See one with `git diff part/4-fortunes challenge/<name>`, or check it out
+to run it. All were tested on Base Sepolia on 2026-11-09, through the class facilitator
+(`challenge/12-facilitator` through its own).
+
+| Branch | Challenge |
+|---|---|
+| `challenge/4-stats` | Free `/stats`: fortunes sold, per route, and revenue, counted in an `onAfterSettle` hook so failed settlements do not count. |
+| `challenge/5-premium` | `/premium` at $0.01, listed in `GET /` with its price. |
+| `challenge/6-balance` | The client prints the USDC balance before paying, and after, read at the settlement's block. |
+| `challenge/7-budget` | The client refuses to sign once the run would spend more than `BUDGET` USDC (default 0.05). |
+| `challenge/8-bulk` | `/bulk?count=N` returns N fortunes at $0.001 each, capped at 10. The price is a function of the request. |
+| `challenge/9-surge` | `/surge` costs $0.0001 more per request in the last minute. Quotes are remembered for 60 seconds, so the paid retry keeps the price the client signed. |
+| `challenge/10-agent` | `completed/agent.js` solves TODOs 5.1 to 5.3: it buys the cheapest offer from each API on the board, once per seller, until its budget runs out. |
+| `challenge/11-eurc` | `/fortune` accepts USDC or EURC. The client allows EURC with `setSpendControls` and pays in it with `PAY_WITH=EURC`. |
+| `challenge/12-facilitator` | `completed/FACILITATOR.md`: run `.instructor/facilitator.js` with your own wallet, and what a dishonest facilitator can and cannot do. |
+| `challenge/13-reseller` | `/resold` buys from `UPSTREAM_URL` and resells it in pirate at $0.002. It refuses upstream prices at or above its own. |
+| `challenge/14-audit` | The server logs each sale to `sales.jsonl`, and `completed/audit.js` checks each one against a `Transfer` on-chain. |
 
 ## Tools
 
