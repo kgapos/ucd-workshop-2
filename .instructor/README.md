@@ -125,16 +125,21 @@ If the facilitator ever has trouble, students can delete the `FACILITATOR_URL` l
 
 ## Releasing the reference solution
 
-The reference solution lives on the `completed` branch, which is pushed but **not merged** into `main`. It only adds
-the `completed/` folder, so it merges cleanly. When you are ready (for example an hour in):
+The reference solution is split into one branch per part, each on top of the one before:
+`part/2-server` (TODOs 2.1 and 2.2), then `part/3-client` (TODOs 3.1 to 3.3), then `part/4-fortunes` (TODO 4.1).
+They are pushed but **not merged** into `main`, and they only add the `completed/` folder, so they merge cleanly.
+
+When you are ready (for example an hour in), release Parts 2 to 4 in one go:
 
 ```bash
 git switch main
-git merge completed
+git merge part/4-fortunes
 git push origin main
 ```
 
-Students then run `git pull` and get `completed/` without conflicts, even if they edited `starter/`.
+To release part by part instead, merge `part/2-server`, `part/3-client` and `part/4-fortunes` in turn as the
+class finishes each part. Students then run `git pull` and get `completed/` without conflicts, even if they
+edited `starter/`.
 
 ## Tools
 

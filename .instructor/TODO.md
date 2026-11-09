@@ -43,7 +43,7 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 ### Repository
 
 - [x] Make the repository public, so that students can create Codespaces from it on their own accounts.
-      Nothing secret is committed. The `completed` branch is pushed but not merged into `main`.
+      Nothing secret is committed. The `part/*` and `challenge/*` branches are pushed but not merged into `main`.
 - [x] Optionally, add a description, topics and a banner image like the previous workshop.
 - [x] Drop the two redundant stash entries left over from development (`git stash list`, then `git stash drop`).
 
@@ -63,8 +63,8 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 - [ ] Part 1: share the board URL. Once most students have registered, run
       `npm run fund -- https://ucd.kgapos.com/apis.json --dry-run`, then run it for real.
       Re-run it for late arrivals.
-- [ ] About an hour in: release the reference solution (`git merge completed && git push origin main`) and
-      tell students to `git pull`.
+- [ ] About an hour in: release the reference solution (`git merge part/4-fortunes && git push origin main`,
+      which brings in Parts 2 to 4) and tell students to `git pull`.
 
 ### Optional
 

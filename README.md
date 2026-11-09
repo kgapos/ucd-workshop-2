@@ -353,7 +353,6 @@ Then run it next to your own code. It reads the same `.env`:
 ```bash
 node --env-file=.env completed/server.js
 node --env-file=.env completed/client.js
-BUDGET=0.01 node --env-file=.env completed/agent.js
 ```
 
 ### Run the instructor tools
