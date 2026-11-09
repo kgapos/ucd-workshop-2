@@ -2,7 +2,8 @@
 // Usage: node --env-file=.env completed/client.js [url]
 import { wrapFetchWithPayment, x402Client, decodePaymentResponseHeader } from "@x402/fetch";
 import { ExactEvmScheme } from "@x402/evm/exact/client";
-import { account, EXPLORER, PORT } from "../config.js";
+import { erc20Abi, formatUnits } from "viem";
+import { account, EXPLORER, PORT, publicClient, USDC } from "../config.js";
 
 const url = process.argv[2] || `http://localhost:${PORT}/fortune`;
 
@@ -10,6 +11,13 @@ const url = process.argv[2] || `http://localhost:${PORT}/fortune`;
 const client = new x402Client().register("eip155:*", new ExactEvmScheme(account()));
 
 const fetchWithPayment = wrapFetchWithPayment(fetch, client);
+
+// Challenge 6: USDC balance before and after. Reading "after" at the settlement's block makes sure
+// we see the payment, even if one of the fallback RPCs is a block or two behind.
+const usdcBalance = (blockNumber) =>
+  publicClient.readContract({ address: USDC, abi: erc20Abi, functionName: "balanceOf", args: [account().address], blockNumber });
+const before = await usdcBalance();
+console.log(`USDC before: ${formatUnits(before, 6)}`);
 
 let res;
 try {
@@ -27,6 +35,9 @@ if (header) {
   const receipt = decodePaymentResponseHeader(header);
   if (receipt.success) {
     console.log(`\nTransaction: ${EXPLORER}/tx/${receipt.transaction}`);
+    const { blockNumber } = await publicClient.waitForTransactionReceipt({ hash: receipt.transaction, timeout: 30_000 });
+    const after = await usdcBalance(blockNumber);
+    console.log(`USDC after:  ${formatUnits(after, 6)} (${formatUnits(after - before, 6)})`);
   } else {
     console.log(`\nPayment failed: ${receipt.errorReason} ${receipt.errorMessage || ""}`);
   }
