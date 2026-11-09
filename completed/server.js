@@ -11,7 +11,9 @@ const payTo = account().address; // payments go to your own wallet
 const fortunes = [
   "A smart contract is only as smart as its author.",
   "You will find a bug in production. It will be yours.",
+  "The block you seek is already finalised.",
   "Not your keys, not your fortune cookie.",
+  "Today is a good day to read the whitepaper.",
 ];
 const pick = () => fortunes[Math.floor(Math.random() * fortunes.length)];
 
