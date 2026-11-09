@@ -68,8 +68,8 @@ Remaining tasks before, during and after the workshop. Amounts assume 40 student
 
 ### Optional
 
-- [ ] Verify the EURC challenge (number 11) end to end: claim EURC to the funder and test a route that
-      accepts both USDC and EURC.
+- [x] Verify the EURC challenge (number 11) end to end: claim EURC to the funder and test a route that
+      accepts both USDC and EURC. Done on 2026-11-09 with `challenge/11-eurc`. The funder holds about 20 EURC.
 - [ ] Restrict the facilitator to settle only payments to registered students' addresses, to limit abuse
       of the public URL.
 - [ ] After the workshop: stop the services, and optionally send leftover testnet funds back to a faucet.

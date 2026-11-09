@@ -3,7 +3,7 @@
 // so for a full classroom run this instead and give students its URL as FACILITATOR_URL.
 //
 // Usage: npm run facilitator   (needs FACILITATOR_PRIVATE_KEY with a little Base Sepolia ETH for gas;
-//        set RPC_URL to one or more comma-separated endpoints, the public default rate-limits)
+//        RPC_URL optionally replaces the public RPCs in config.js with your own, comma-separated)
 import express from "express";
 import { createWalletClient, publicActions, nonceManager } from "viem";
 import { privateKeyToAccount } from "viem/accounts";

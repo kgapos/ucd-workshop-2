@@ -175,7 +175,7 @@ The instructor will then send testnet USDC to every registered address. Wait a m
 npm run balance
 ```
 
-If you see a 1 USDC and 0.0005 ETH balance, you are ready to go! Open the explorer link it prints 
+If you see a 1 USDC and 0.0005 ETH balance, you are ready to go! Open the explorer link it prints
 and look at the transfer you received.
 
 ## Part 2: A paid API
