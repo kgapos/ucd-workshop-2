@@ -31,7 +31,23 @@ app.set("trust proxy", true); // Codespaces sits behind a proxy
 
 const facilitator = new HTTPFacilitatorClient({ url: FACILITATOR_URL });
 const resourceServer = new x402ResourceServer(facilitator).register(NETWORK, new ExactEvmScheme());
+
+// Challenge 4: count sales only once the payment has settled on-chain. The route handler runs
+// before settlement, and a failed settlement turns the response into a 402, so counting there would lie.
+// ponytail: in memory, resets on restart; persist it to a file if that matters.
+const stats = { fortunesSold: 0, revenueUsdc: 0, byRoute: {} };
+resourceServer.onAfterSettle(async ({ result, requirements, transportContext }) => {
+  if (!result.success) return;
+  const route = transportContext?.request?.path;
+  stats.fortunesSold++;
+  stats.revenueUsdc = Number((stats.revenueUsdc + Number(requirements.amount) / 1e6).toFixed(6));
+  stats.byRoute[route] = (stats.byRoute[route] || 0) + 1;
+});
+
 app.use(paymentMiddleware(paidRoutes, resourceServer));
+
+// Free: how business is going.
+app.get("/stats", (req, res) => res.json(stats));
 
 // Free: describes this API so classmates (and agents) know what is on offer.
 app.get("/", (req, res) => {
