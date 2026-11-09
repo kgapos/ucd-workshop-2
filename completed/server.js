@@ -18,13 +18,25 @@ const fortunes = [
 const pick = () => fortunes[Math.floor(Math.random() * fortunes.length)];
 
 // Part 2: which routes cost money, how much, and who gets paid.
+// Challenge 8: a dynamic price computed from the request (/bulk).
 const paidRoutes = {
   "GET /fortune": {
     accepts: { scheme: "exact", price: "$0.001", network: NETWORK, payTo },
     description: "One fortune cookie",
     mimeType: "application/json",
   },
+  "GET /bulk": {
+    accepts: {
+      scheme: "exact",
+      price: (ctx) => `$${(0.001 * bulkCount(ctx.adapter.getQueryParam("count"))).toFixed(3)}`,
+      network: NETWORK,
+      payTo,
+    },
+    description: "?count=N fortunes at $0.001 each (max 10)",
+    mimeType: "application/json",
+  },
 };
+const bulkCount = (n) => Math.min(Math.max(parseInt(n) || 1, 1), 10);
 
 const app = express();
 app.set("trust proxy", true); // Codespaces sits behind a proxy
@@ -48,6 +60,7 @@ app.get("/", (req, res) => {
 
 app.get("/hello", (req, res) => res.json({ message: `Hello from ${name}, this one is free.` }));
 app.get("/fortune", (req, res) => res.json({ fortune: pick(), from: name }));
+app.get("/bulk", (req, res) => res.json({ fortunes: Array.from({ length: bulkCount(req.query.count) }, pick), from: name }));
 
 app.listen(PORT, () => {
   console.log(`API for ${name} listening on port ${PORT}`);
