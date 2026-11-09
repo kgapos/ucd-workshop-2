@@ -5,6 +5,7 @@ import { baseSepolia } from "viem/chains";
 
 export const NETWORK = "eip155:84532"; // Base Sepolia, in CAIP-2 format
 export const USDC = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"; // Circle's USDC on Base Sepolia
+export const EURC = "0x808456652fdb597867f38412077A9182bf77359F"; // Circle's EURC on Base Sepolia (challenge 11)
 export const EXPLORER = "https://sepolia.basescan.org";
 export const FACILITATOR_URL = process.env.FACILITATOR_URL || "https://x402.org/facilitator";
 export const PORT = Number(process.env.PORT || 4021);
